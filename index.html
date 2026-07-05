@@ -3,115 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>စမ်းရေမိုး Stage Celebration</title>
+    <title>စမ်းရေမိုး YouTube Live Celebration Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
-        
-        body { 
-            font-family: 'Pyidaungsu', sans-serif; 
-            background: radial-gradient(circle, #2d0a0a 0%, #0a0404 100%);
-            color: #fce8cc; 
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Stage Curtains Effect */
-        .stage-curtain {
-            background: linear-gradient(90deg, #4a0000 0%, #8b0000 50%, #4a0000 100%);
-            box-shadow: inset 0 0 100px #000;
-        }
-
-        .stage-frame {
-            border: 15px solid #d4af37;
-            box-shadow: 0 0 30px #d4af37 inset, 0 0 50px rgba(0,0,0,0.5);
-            background: rgba(0,0,0,0.7);
-        }
-
-        .gold-glow { text-shadow: 0 0 15px #d4af37; }
-
-        /* Smooth UI Animations */
-        .fade-in { animation: fadeIn 1s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Pyidaungsu', sans-serif; background: #090610; color: #fce8cc; overflow-x: hidden; }
+        .royal-gold-gradient { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .royal-gold-button { background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%); color: #090610; font-weight: bold; transition: all 0.3s; }
+        .curtain-backdrop { background: linear-gradient(90deg, #2b0307 0%, #110103 50%, #2b0307 100%); }
+        .glass-panel { background: rgba(15, 10, 25, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.2); }
+        .particle { position: absolute; pointer-events: none; z-index: 5; animation: fall linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-50px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen">
+    <div id="particles-background" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Admin & Stage Container -->
-    <div id="app-shell" class="w-full max-w-4xl">
-        
-        <!-- Mode Toggles -->
-        <div id="controls" class="flex justify-center gap-4 mb-6">
-            <button onclick="setMode('admin')" class="px-6 py-2 bg-amber-900 border border-amber-600 rounded-full hover:bg-amber-800 transition">Admin Panel</button>
-            <button onclick="setMode('overlay')" class="px-6 py-2 bg-red-900 border border-red-600 rounded-full hover:bg-red-800 transition">Stage View</button>
-        </div>
+    <div class="container mx-auto px-4 py-6 relative z-10">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-extrabold royal-gold-gradient mb-1">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
+        </header>
 
-        <!-- Stage View (Overlay) -->
-        <div id="overlay-view" class="hidden stage-frame rounded-3xl p-12 min-h-[400px] flex flex-col items-center justify-center text-center">
-            <h1 class="text-amber-500 text-6xl font-black mb-8 gold-glow" id="display-title">မွေးနေ့ဂုဏ်ပြုပွဲ</h1>
-            <div id="display-box" class="space-y-6">
-                <p id="display-wish" class="text-3xl font-bold leading-relaxed italic text-white italic">"ပရိသတ်များရဲ့ ဆုတောင်းစာများကို ဤနေရာတွင် ကြည့်ရှုနိုင်ပါသည်..."</p>
-            </div>
-        </div>
-
-        <!-- Admin Panel -->
-        <div id="admin-view" class="bg-black/80 p-8 rounded-2xl border border-amber-900 shadow-2xl">
-            <h2 class="text-2xl font-bold text-amber-500 mb-6 text-center">Admin Control Panel</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">အမည်</label>
-                    <input id="in-name" type="text" class="w-full bg-stone-900 border border-amber-800 p-3 rounded-lg text-white mb-4">
-                    <label class="block text-sm text-gray-400 mb-2">ဆုတောင်းစာ</label>
-                    <textarea id="in-wish" class="w-full bg-stone-900 border border-amber-800 p-3 rounded-lg text-white h-32"></textarea>
-                    <button onclick="submitWish()" class="w-full mt-4 bg-amber-600 hover:bg-amber-500 py-3 rounded-lg font-bold">ဂုဏ်ပြုပေးပို့မည်</button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Side: OBS Overlay -->
+            <div class="lg:col-span-8">
+                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/30 flex flex-col items-center justify-center p-8">
+                    <div id="display-area" class="text-center w-full max-w-lg">
+                        <h2 id="display-name" class="text-3xl font-bold text-amber-100 mb-4">မွေးနေ့ဂုဏ်ပြုပွဲ</h2>
+                        <p id="display-wish" class="text-xl text-amber-200/90 italic">ပရိသတ်များ ဆုတောင်းစာ ပို့ရန် စောင့်ဆိုင်းနေပါသည်...</p>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                    <div id="qrcode" class="bg-white p-2 rounded-lg"></div>
-                    <p class="mt-2 text-xs text-amber-700">Scan ဖတ်ပြီး ဆုတောင်းပေးပို့ပါ</p>
+            </div>
+
+            <!-- Right Side: Control & QR -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
+                    <h2 class="text-lg font-bold text-amber-300 mb-3">ဆုတောင်းစာ ပို့ရန်</h2>
+                    <input id="v-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2">
+                    <textarea id="v-wish" placeholder="မွေးနေ့ဆုတောင်း..." class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2 h-20"></textarea>
+                    <button onclick="submitWish()" class="w-full py-2 royal-gold-button rounded-lg">ပေးပို့မည်</button>
+                </div>
+
+                <!-- QR Code Section -->
+                <div class="glass-panel p-5 rounded-xl border border-amber-500/30 text-center">
+                    <h2 class="text-sm font-bold text-amber-300 mb-2">ပရိသတ်များအတွက် QR Code</h2>
+                    <div id="qrcode" class="flex justify-center bg-white p-2 rounded w-32 h-32 mx-auto"></div>
+                    <p class="text-[10px] text-amber-500/70 mt-2">Scan ဖတ်ပြီး ဆုတောင်းပေးပို့နိုင်ပါသည်</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // FIREBASE CONFIG: သင်၏ API Key များနှင့် အစားထိုးပါ
+        // 1. Firebase Configuration (သင့် Firebase Project မှရသော Config ကို အစားထိုးပါ)
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
-            databaseURL: "https://your-project-id.firebaseio.com",
-            projectId: "your-project-id"
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // UI Setup
+        // 2. QR Code Generation
         new QRCode(document.getElementById("qrcode"), window.location.href);
 
-        function setMode(mode) {
-            document.getElementById('admin-view').classList.toggle('hidden', mode !== 'admin');
-            document.getElementById('overlay-view').classList.toggle('hidden', mode !== 'overlay');
-        }
-
-        // Firebase Logic
+        // 3. Real-time Listener (OBS Screen ပေါ်တွင် အမြဲတမ်း ပေါ်နေစေရန်)
         db.ref('latestWish').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                document.getElementById('display-title').innerText = `✨ ${data.name} ✨`;
-                document.getElementById('display-wish').innerText = `"${data.wish}"`;
-                document.getElementById('display-box').classList.add('fade-in');
+                document.getElementById('display-name').innerText = `✨ ${data.name} ✨`;
+                document.getElementById('display-wish').innerText = data.wish;
+                triggerGoldRain(); 
             }
         });
 
+        // 4. Submit Wish
         function submitWish() {
-            const name = document.getElementById('in-name').value;
-            const wish = document.getElementById('in-wish').value;
-            if(!name || !wish) return alert("ကျေးဇူးပြု၍ အချက်အလက်ဖြည့်ပါ။");
+            const name = document.getElementById('v-name').value;
+            const wish = document.getElementById('v-wish').value;
+            if(!name || !wish) return alert("အချက်အလက် ပြည့်စုံအောင် ဖြည့်ပါ။");
             
             db.ref('latestWish').set({ name, wish, timestamp: Date.now() });
+            alert("ပေးပို့ပြီးပါပြီ!");
+        }
+
+        // 5. Gold Rain Animation
+        function triggerGoldRain() {
+            const container = document.getElementById('particles-background');
+            for(let i=0; i<15; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random()*100 + '%';
+                p.style.animationDuration = '3s';
+                p.innerHTML = '✨';
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 3000);
+            }
         }
     </script>
 </body>

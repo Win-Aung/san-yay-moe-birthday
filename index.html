@@ -14,22 +14,24 @@
         body { font-family: 'Pyidaungsu', sans-serif; background: radial-gradient(circle, #1a0505 0%, #050202 100%); color: #fce8cc; overflow-x: hidden; }
         .stage-frame { border: 10px solid #d4af37; box-shadow: 0 0 50px rgba(212, 175, 55, 0.3) inset; }
         .gold-glow { text-shadow: 0 0 20px #d4af37; }
-        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .glass { background: rgba(15,15,15,.72); backdrop-filter: blur(16px); border:1px solid rgba(255,215,0,.25); box-shadow:0 0 30px rgba(212,175,55,.25);}
+        .stage-frame{border:8px solid #d4af37;border-radius:32px;background:linear-gradient(180deg,#2b1200,#120707);box-shadow:0 0 60px rgba(212,175,55,.45), inset 0 0 40px rgba(255,215,0,.15);}
+        
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
 
-    <div id="app" class="w-full max-w-4xl">
+    <div id="app" class="w-full max-w-7xl">
         <!-- Control Toggles -->
-        <div class="flex justify-center gap-4 mb-10">
+        <div class="flex justify-center gap-4 mb-8">
             <button onclick="switchView('admin')" class="bg-amber-900 px-6 py-2 rounded-full border border-amber-600 hover:bg-amber-800 transition">Control Panel</button>
             <button onclick="switchView('stage')" class="bg-red-900 px-6 py-2 rounded-full border border-red-600 hover:bg-red-800 transition">Stage View</button>
         </div>
 
         <!-- Stage View -->
-        <div id="stage-view" class="hidden stage-frame rounded-3xl p-20 min-h-[400px] flex flex-col items-center justify-center text-center">
-            <h5 id="display-name" class="text-amber-500 text-6xl font-black mb-8 gold-glow">မွေးနေ့ဂုဏ်ပြုပွဲ</h5>
-            <p id="display-wish" class="text-3xl font-bold italic text-white leading-relaxed">"ပရိသတ်များ၏ ဆုတောင်းစာများ ရောက်ရှိလာပါမည်..."</p>
+        <div id="stage-view" class="hidden stage-frame rounded-3xl p-20 min-h-[700px] flex flex-col items-center justify-center text-center">
+            <h1 id="display-name" class="text-amber-500 text-8xl font-black mb-8 gold-glow">မွေးနေ့ဂုဏ်ပြုပွဲ</h1>
+            <p id="display-wish" class="text-5xl max-w-5xl font-bold italic text-white leading-relaxed">"ပရိသတ်များ၏ ဆုတောင်းစာများ ရောက်ရှိလာပါမည်..."</p>
 			
         </div>
 

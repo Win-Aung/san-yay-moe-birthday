@@ -248,6 +248,51 @@
         function toggleChromaMode() { document.getElementById('live-overlay-container').classList.toggle('bg-green-600'); }
         function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; document.getElementById('queue-badge').innerText = '0'; }
         function triggerPetalBurst() { alert("ပန်းမိုး ပွင့်လာပါပြီ!"); }
+
+        function sendViewerWish() {
+    const name = document.getElementById('viewer-form-name').value;
+    const wish = document.getElementById('viewer-form-wish').value;
+    
+    if(!name || !wish) {
+        alert("အမည်နဲ့ ဆုတောင်းစကား ဖြည့်ပေးပါဦး");
+        return;
+    }
+
+    // URL ထဲက hostId (view parameter) ကို ပြန်ယူခြင်း
+    const params = new URLSearchParams(window.location.search);
+    const targetHostId = params.get('view'); 
+
+    if(!targetHostId) {
+        alert("Error: Host ID မတွေ့ရှိပါ။ Link ကို ပြန်စစ်ပါ။");
+        return;
+    }
+
+    console.log("Connecting to Host:", targetHostId);
+    
+    // Viewer အတွက် သီးသန့် Peer instance တစ်ခု
+    const peer = new Peer();
+    
+    peer.on('open', () => {
+        const conn = peer.connect(targetHostId);
+        
+        conn.on('open', () => {
+            conn.send({ name, wish });
+            alert("ပို့ဆောင်ခြင်း အောင်မြင်ပါသည်။");
+            document.getElementById('viewer-form-wish').value = '';
+            document.getElementById('viewer-submission-screen').classList.add('hidden');
+        });
+        
+        conn.on('error', (err) => {
+            console.error("Connection Error:", err);
+            alert("Host နဲ့ ချိတ်ဆက်လို့မရပါ။ Host online ရှိမရှိ ပြန်စစ်ပေးပါ။");
+        });
+    });
+
+    peer.on('error', (err) => {
+        console.error("Peer Error:", err);
+        alert("ချိတ်ဆက်မှု အမှားအယွင်းရှိသည် (" + err.type + ")");
+    });
+}
     </script>
 </body>
 </html>

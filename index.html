@@ -6,40 +6,33 @@
     <title>စမ်းရေမိုး YouTube Live Celebration Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compatible Version) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <style>
-        body { font-family: 'Pyidaungsu', sans-serif; background: #090610; color: #fce8cc; overflow-x: hidden; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: #090610; color: #fce8cc; }
         .royal-gold-gradient { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .royal-gold-button { background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%); color: #090610; font-weight: bold; transition: all 0.3s; }
-        .curtain-backdrop { background: linear-gradient(90deg, #2b0307 0%, #110103 50%, #2b0307 100%); }
+        .royal-gold-button { background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%); color: #090610; font-weight: bold; }
         .glass-panel { background: rgba(15, 10, 25, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.2); }
-        .particle { position: absolute; pointer-events: none; z-index: 5; animation: fall linear infinite; }
-        @keyframes fall { 0% { transform: translateY(-50px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
     </style>
 </head>
 <body class="min-h-screen">
-    <div id="particles-background" class="fixed inset-0 pointer-events-none z-0"></div>
-
-    <div class="container mx-auto px-4 py-6 relative z-10">
+    <div class="container mx-auto px-4 py-6">
         <header class="text-center mb-6">
-            <h1 class="text-3xl font-extrabold royal-gold-gradient mb-1">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
+            <h1 class="text-3xl font-extrabold royal-gold-gradient">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left Side: OBS Overlay -->
+            <!-- Left: OBS Overlay -->
             <div class="lg:col-span-8">
-                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/30 flex flex-col items-center justify-center p-8">
-                    <div id="display-area" class="text-center w-full max-w-lg">
-                        <h2 id="display-name" class="text-3xl font-bold text-amber-100 mb-4">မွေးနေ့ဂုဏ်ပြုပွဲ</h2>
-                        <p id="display-wish" class="text-xl text-amber-200/90 italic">ပရိသတ်များ ဆုတောင်းစာ ပို့ရန် စောင့်ဆိုင်းနေပါသည်...</p>
-                    </div>
+                <div class="border border-amber-500/30 rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+                    <h2 id="display-name" class="text-3xl font-bold text-amber-100 mb-4">မွေးနေ့ဂုဏ်ပြုပွဲ</h2>
+                    <p id="display-wish" class="text-xl text-amber-200/90 italic">ပရိသတ်များ ဆုတောင်းစာ ပို့ရန် စောင့်ဆိုင်းနေပါသည်...</p>
                 </div>
             </div>
 
-            <!-- Right Side: Control & QR -->
+            <!-- Right: Input -->
             <div class="lg:col-span-4 space-y-4">
                 <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
                     <h2 class="text-lg font-bold text-amber-300 mb-3">ဆုတောင်းစာ ပို့ရန်</h2>
@@ -47,45 +40,39 @@
                     <textarea id="v-wish" placeholder="မွေးနေ့ဆုတောင်း..." class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2 h-20"></textarea>
                     <button onclick="submitWish()" class="w-full py-2 royal-gold-button rounded-lg">ပေးပို့မည်</button>
                 </div>
-
-                <!-- QR Code Section -->
-                <div class="glass-panel p-5 rounded-xl border border-amber-500/30 text-center">
-                    <h2 class="text-sm font-bold text-amber-300 mb-2">ပရိသတ်များအတွက် QR Code</h2>
-                    <div id="qrcode" class="flex justify-center bg-white p-2 rounded w-32 h-32 mx-auto"></div>
-                    <p class="text-[10px] text-amber-500/70 mt-2">Scan ဖတ်ပြီး ဆုတောင်းပေးပို့နိုင်ပါသည်</p>
-                </div>
+                <div id="qrcode" class="flex justify-center bg-white p-2 rounded w-32 h-32 mx-auto"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. Firebase Configuration (သင့် Firebase Project မှရသော Config ကို အစားထိုးပါ)
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBbRZLUYhEvTHoCscb2ul_JURGsfBjCF4s",
+            authDomain: "birthday-62720.firebaseapp.com",
+            databaseURL: "https://birthday-62720-default-rtdb.firebaseio.com", 
+            projectId: "birthday-62720",
+            storageBucket: "birthday-62720.firebasestorage.app",
+            messagingSenderId: "915031456534",
+            appId: "1:915031456534:web:8636c870c1411175b62e37"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 2. QR Code Generation
+        // QR Code Generation
         new QRCode(document.getElementById("qrcode"), window.location.href);
 
-        // 3. Real-time Listener (OBS Screen ပေါ်တွင် အမြဲတမ်း ပေါ်နေစေရန်)
+        // Real-time Listener
         db.ref('latestWish').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('display-name').innerText = `✨ ${data.name} ✨`;
                 document.getElementById('display-wish').innerText = data.wish;
-                triggerGoldRain(); 
             }
         });
 
-        // 4. Submit Wish
+        // Submit Wish
         function submitWish() {
             const name = document.getElementById('v-name').value;
             const wish = document.getElementById('v-wish').value;
@@ -93,20 +80,6 @@
             
             db.ref('latestWish').set({ name, wish, timestamp: Date.now() });
             alert("ပေးပို့ပြီးပါပြီ!");
-        }
-
-        // 5. Gold Rain Animation
-        function triggerGoldRain() {
-            const container = document.getElementById('particles-background');
-            for(let i=0; i<15; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random()*100 + '%';
-                p.style.animationDuration = '3s';
-                p.innerHTML = '✨';
-                container.appendChild(p);
-                setTimeout(() => p.remove(), 3000);
-            }
         }
     </script>
 </body>

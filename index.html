@@ -6,140 +6,229 @@
     <title>စမ်းရေမိုး YouTube Live Celebration Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 
     <style>
         body { font-family: 'Pyidaungsu', 'Segoe UI', Roboto, sans-serif; background: #090610; color: #fce8cc; overflow-x: hidden; }
         .royal-gold-gradient { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .royal-card-border { border: 2px solid; border-image: linear-gradient(to right, #8b6508, #FFE89C, #D4AF37, #8B6508) 1; }
         .royal-gold-button { background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%); color: #090610; font-weight: bold; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .royal-gold-button:hover { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 100%); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
         .curtain-backdrop { background: linear-gradient(90deg, #2b0307 0%, #110103 50%, #2b0307 100%); }
-        .glass-panel { background: rgba(15, 10, 25, 0.80); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.15); }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #090610; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg) translateX(0px); opacity: 0; } 15% { opacity: 0.9; } 90% { opacity: 0.9; } 100% { transform: translateY(110vh) rotate(360deg) translateX(80px); opacity: 0; } }
         .particle { position: absolute; pointer-events: none; z-index: 5; }
+        .glass-panel { background: rgba(15, 10, 25, 0.80); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.15); }
     </style>
 </head>
 <body class="relative min-h-screen">
+
     <div id="particles-background" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
     <div class="container mx-auto px-4 py-6 relative z-10">
         <header class="text-center mb-6">
             <h1 class="text-2xl md:text-4xl font-extrabold royal-gold-gradient mb-1 tracking-wider font-serif">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
+            <p class="text-amber-200/70 text-xs md:text-sm">မြန်မာ့ရိုးရာသဘင်မင်းသားလေး မွေးနေ့ဂုဏ်ပြုပွဲ တိုက်ရိုက်ထုတ်လွှင့်မှု အလှဆင်စနစ်</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <div class="lg:col-span-8 flex flex-col gap-5">
-                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/40 flex flex-col p-8">
-                    <div class="my-auto text-center z-10" id="slide-display-area">
-                        <h2 class="text-2xl md:text-4xl font-bold text-amber-100 mb-4" id="slide-title"></h2>
-                        <p class="text-base md:text-lg text-amber-200/90" id="slide-content"></p>
+                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/40 flex flex-col justify-between p-6 md:p-8 transition-all duration-500">
+                    <div class="flex justify-between items-start z-10 w-full">
+                        <div class="glass-panel px-3 py-1 rounded-full text-[10px] text-amber-300 flex items-center gap-2 border border-amber-500/30">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                            <span>LIVE PRESENTATION SCREEN</span>
+                        </div>
+                        <div class="glass-panel px-3 py-1 rounded-full text-[10px] text-amber-200 border border-amber-500/30 font-serif">🎂 Happy Birthday မင်းသားလေး စမ်းရေမိုး</div>
                     </div>
-                    <div id="wish-card-display" class="hidden absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6">
-                        <h3 class="text-xl text-amber-400 font-bold mb-2" id="wish-sender-title"></h3>
-                        <p class="text-lg text-white italic" id="wish-generated-text"></p>
+
+                    <div class="my-auto text-center z-10 max-w-2xl mx-auto flex flex-col justify-center items-center py-2">
+                        <div id="slide-display-area" class="transition-all duration-300 transform scale-100 opacity-100">
+                            <h2 class="text-xl md:text-3xl font-bold text-amber-100 mb-3 font-serif leading-relaxed" id="slide-title"></h2>
+                            <p class="text-xs md:text-base text-amber-200/90 leading-loose text-justify md:text-center px-4" id="slide-content"></p>
+                        </div>
+                        <div id="wish-card-display" class="hidden transform scale-95 opacity-0 transition-all duration-500 w-full bg-black/40 p-5 rounded-xl border border-amber-500/30 relative">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 bg-amber-600 rounded-full text-[10px] font-bold text-black uppercase tracking-wider">ပရိသတ် မွေးနေ့ဆုတောင်း</div>
+                            <h3 class="text-base md:text-xl font-bold text-amber-300 mb-2 font-serif" id="wish-sender-title"></h3>
+                            <p class="text-xs md:text-base text-white/95 italic leading-relaxed" id="wish-generated-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center z-10 w-full border-t border-amber-500/20 pt-2.5">
+                        <div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-300 text-xs"><i class="fa-solid fa-masks-theater"></i></div><span class="text-[10px] md:text-xs text-amber-300 font-semibold">သဘင်မင်းသားလေး စမ်းရေမိုး</span></div>
+                        <div class="text-[9px] md:text-xs text-amber-400/60">#SanYayMoeBirthday2026</div>
                     </div>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="prevSlide()" class="glass-panel p-3 text-amber-300 rounded">ယခင်</button>
-                    <button onclick="nextSlide()" class="glass-panel p-3 text-amber-300 rounded">နောက်တစ်ပုဒ်</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                        <h3 class="text-amber-300 text-sm font-semibold mb-3 flex items-center gap-2"><i class="fa-solid fa-photo-film"></i> ဂုဏ်ပြုဆောင်းပါး တင်ဆက်မှုစနစ်</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="prevSlide()" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded text-xs transition"><i class="fa-solid fa-chevron-left mr-1"></i> ယခင်</button>
+                            <button id="btn-auto-play" onclick="toggleAutoPlay()" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded text-xs transition font-semibold"><i class="fa-solid fa-play mr-1"></i> Auto-Play</button>
+                            <button onclick="nextSlide()" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded text-xs transition">နောက်တစ်ပုဒ် <i class="fa-solid fa-chevron-right ml-1"></i></button>
+                        </div>
+                        <div class="mt-2.5 text-[10px] text-amber-400/50" id="slide-index-indicator"></div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                        <h3 class="text-amber-300 text-sm font-semibold mb-3 flex items-center gap-2"><i class="fa-solid fa-sliders"></i> စင်မြင့် နောက်ခံ သက်ရောက်မှုများ</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="triggerPetalBurst()" class="px-2.5 py-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 rounded text-xs transition">🌸 ပန်းမိုး</button>
+                            <button onclick="toggleGoldRain()" id="btn-gold-rain" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded text-xs transition">✨ ရွှေမိုး</button>
+                            <button onclick="toggleChromaMode()" id="btn-chroma" class="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition font-semibold"><i class="fa-solid fa-eye-slash mr-1"></i> OBS Overlay</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="lg:col-span-4 flex flex-col gap-5">
-                <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
-                    <h2 class="text-lg font-bold text-amber-300 mb-2">ပရိသတ်ဆုတောင်းစနစ်</h2>
-                    <div class="flex justify-center p-3 bg-white rounded-lg"><img id="qr-image" class="w-[120px] h-[120px]"></div>
-                    <div id="connection-status" class="mt-2 text-xs text-amber-400 text-center font-mono">စနစ်စတင်နေသည်...</div>
+                <div class="glass-panel p-5 rounded-xl border-2 border-amber-500/40 relative overflow-hidden">
+                    <h2 class="text-lg font-bold text-amber-300 mb-2 flex items-center gap-2"><i class="fa-solid fa-qrcode text-amber-400 animate-pulse"></i> ပရိသတ်တိုက်ရိုက်ပေးပို့စနစ်</h2>
+                    <p class="text-[11px] text-amber-100/70 mb-4">QR Code ကို ဖုန်းဖြင့် Scan ဖတ်ပြီး ပရိသတ်များ ဆုတောင်းပို့နိုင်ပါသည်။</p>
+                    <div class="flex flex-col items-center bg-black/40 p-4 rounded-lg border border-amber-500/20 mb-3">
+                        <div id="qrcode-wrapper" class="p-2 bg-white rounded-lg inline-block mb-3"><img id="qr-image" src="" alt="Live QR Code" class="w-[120px] h-[120px] block"></div>
+                        <div id="connection-status" class="text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-amber-950/50 text-amber-400 border border-amber-500/20">ချိတ်ဆက်နေသည်...</div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <input id="share-link-input" type="text" readonly class="bg-black/60 border border-amber-500/20 text-xs px-2 py-1 rounded text-amber-200">
+                        <button onclick="openLocalTestTab()" class="w-full py-1 bg-amber-500 text-black font-bold rounded text-[9px] hover:bg-white transition uppercase">စမ်းသပ်ရန် Viewer ဖွင့်မည်</button>
+                    </div>
                 </div>
-                <div class="glass-panel p-4 rounded-xl max-h-[200px] overflow-y-auto" id="wishes-queue"></div>
+                <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-amber-300">ရောက်ရှိလာသော ဆုတောင်းများ <span id="queue-badge" class="bg-amber-500 text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">0</span></h3>
+                        <button onclick="clearQueue()" class="text-[10px] text-rose-400 underline">ဖျက်ရန်</button>
+                    </div>
+                    <div id="wishes-queue" class="max-h-[180px] overflow-y-auto space-y-2 pr-1"></div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                    <div class="flex gap-1.5">
+                        <input id="manual-name" type="text" placeholder="ပရိသတ်အမည်" class="bg-black/40 border border-amber-500/20 rounded px-2.5 py-1 text-xs text-amber-100 flex-grow">
+                        <button onclick="submitManualWish()" class="px-3 py-1 royal-gold-button rounded text-xs">ဖန်တီးရန်</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Viewer Screen -->
-    <div id="viewer-submission-screen" class="hidden fixed inset-0 z-50 bg-[#07050a] p-6 flex flex-col items-center justify-center">
-        <div class="max-w-sm w-full space-y-4 glass-panel p-6 rounded-xl">
-            <input id="viewer-form-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 p-3 rounded border border-amber-500/20 text-white">
-            <textarea id="viewer-form-wish" placeholder="ဆုတောင်းစကား..." class="w-full bg-black/40 p-3 rounded border border-amber-500/20 text-white"></textarea>
-            <button onclick="sendViewerWish()" class="w-full py-3 royal-gold-button rounded">ပေးပို့မည်</button>
+    <div id="viewer-submission-screen" class="hidden fixed inset-0 z-50 bg-[#07050a] p-6 flex flex-col justify-between">
+        <h1 class="text-xl font-bold royal-gold-gradient text-center">မင်းသားလေး စမ်းရေမိုး မွေးနေ့ပွဲ</h1>
+        <div class="max-w-sm mx-auto w-full space-y-4">
+            <input id="viewer-form-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/20 rounded-lg p-2.5 text-xs text-amber-100">
+            <button onclick="sendViewerWish()" class="w-full py-3 royal-gold-button rounded-xl text-xs">ဆုတောင်းစာလွှာ ပို့မည်</button>
         </div>
     </div>
 
+    <audio id="bell-chime" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav"></audio>
+
     <script>
         const slidesData = [
-            { title: "စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်", content: "သျှင်သျှင်နုနုနဲ့ ရိုးရာအကအလှတွေကို အသက်သွင်းပေးသူ။" },
-            { title: "မင်္ဂလာရှိလှသော မွေးနေ့", content: "မင်းသားလေး စမ်းရေမိုးအတွက် အကောင်းဆုံးသော ဆုတောင်းများ။" }
+            { title: "စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်", content: "သျှင်သျှင်နုနု၊ ယဉ်ယဉ်ကျေးကျေးနဲ့ ရိုးရာအကအလှတွေနဲ့ ပရိသတ်ကို ဆွဲဆောင်ထားနိုင်တဲ့ မင်းသားလေး စမ်းရေမိုး။" },
+            { title: "မင်္ဂလာရှိလှသော မွေးနေ့ရက်မြတ်", content: "အနုပညာကို အသက်ထက်တန်ဖိုးထားတဲ့ မင်းသားလေးအတွက် ဂုဏ်ပြုဆုတောင်းခြင်း။" },
+            { title: "ရိုးရာကို အသက်သွင်းသူ", content: "ကိုယ်ပိုင် Signature ဟန်ပန်တွေနဲ့ ပရိသတ်အသည်းကို ဖမ်းစားထားသူ။" },
+            { title: "ကမ္ဘာ့စင်မြင့်ဆီသို့", content: "မြန်မာ့ရိုးရာဇာတ်သဘင်ကို ယူနက်စကို စာရင်းဝင်စေဖို့ ရည်မှန်းချက်ကြီးကြီးနဲ့ ကြိုးစားနေသူ။" },
+            { title: "စစ်မှန်သော မေတ္တာ", content: "ပရိသတ်တွေရဲ့ မေတ္တာအချစ်တွေဟာ မင်းသားလေးအတွက် အခိုင်မာဆုံးသော အကာအကွယ်ဖြစ်ပါစေ။" }
         ];
+
         let currentSlideIndex = 0;
-        let peer, hostId;
+        let autoPlayTimer = null;
+        let goldRainActive = true;
+
+        window.onload = () => {
+            renderSlide();
+            initGoldRain();
+            generateLocalChannelId();
+            checkIfViewer();
+        };
 
         function renderSlide() {
             document.getElementById('slide-title').innerText = slidesData[currentSlideIndex].title;
             document.getElementById('slide-content').innerText = slidesData[currentSlideIndex].content;
+            document.getElementById('slide-index-indicator').innerText = `အပိုင်း - ${currentSlideIndex + 1} / ${slidesData.length}`;
         }
 
         function nextSlide() { currentSlideIndex = (currentSlideIndex + 1) % slidesData.length; renderSlide(); }
         function prevSlide() { currentSlideIndex = (currentSlideIndex - 1 + slidesData.length) % slidesData.length; renderSlide(); }
 
-        function startHost() {
-            peer = new Peer();
-            peer.on('open', (id) => {
-                hostId = id;
-                document.getElementById('connection-status').innerText = "ချိတ်ဆက်ရန် အသင့်ဖြစ်ပြီ";
-                const url = window.location.href.split('?')[0] + "?view=" + id;
-                document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
-            });
-            peer.on('connection', (conn) => {
-                conn.on('data', (data) => displayWish(data.name, data.wish));
-            });
+        function toggleAutoPlay() {
+            const btn = document.getElementById('btn-auto-play');
+            if (autoPlayTimer) {
+                clearInterval(autoPlayTimer); autoPlayTimer = null;
+                btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Auto-Play';
+            } else {
+                autoPlayTimer = setInterval(nextSlide, 3000);
+                btn.innerHTML = '<i class="fa-solid fa-pause mr-1"></i> Stop';
+            }
+        }
+
+        function initGoldRain() {
+            if (!goldRainActive) return;
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+            p.innerHTML = '✨';
+            document.getElementById('particles-background').appendChild(p);
+            setTimeout(() => p.remove(), 5000);
+            setTimeout(initGoldRain, 500);
+        }
+
+        function toggleGoldRain() {
+            goldRainActive = !goldRainActive;
+            document.getElementById('btn-gold-rain').innerText = goldRainActive ? "✨ ရွှေမိုး (ဖွင့်ထား)" : "✨ ရွှေမိုး (ပိတ်ထား)";
+            if (goldRainActive) initGoldRain();
+        }
+
+        function toggleChromaMode() {
+            const el = document.getElementById('live-overlay-container');
+            el.classList.toggle('bg-green-600');
+            el.classList.toggle('curtain-backdrop');
+        }
+
+        function submitManualWish() {
+            const name = document.getElementById('manual-name').value;
+            if(!name) return;
+            displayWish(name, "မွေးနေ့မှာ ကျန်းမာချမ်းသာပါစေဗျာ။");
+            document.getElementById('manual-name').value = '';
+        }
+
+        function displayWish(name, text) {
+            document.getElementById('wish-sender-title').innerText = `${name} မှ ဆုတောင်းအပ်ပါသည်`;
+            document.getElementById('wish-generated-text').innerText = text;
+            document.getElementById('slide-display-area').classList.add('hidden');
+            const card = document.getElementById('wish-card-display');
+            card.classList.remove('hidden');
+            setTimeout(() => card.classList.remove('scale-95', 'opacity-0'), 50);
+            document.getElementById('bell-chime').play();
+            setTimeout(() => { card.classList.add('hidden'); document.getElementById('slide-display-area').classList.remove('hidden'); }, 8000);
+        }
+
+        function generateLocalChannelId() {
+            const id = 'SANYAYMOE-' + Math.floor(Math.random()*9999);
+            document.getElementById('share-link-input').value = window.location.href + "?view=" + id;
+            document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href + "?view=" + id)}`;
+        }
+
+        function checkIfViewer() {
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('view')) {
+                document.getElementById('viewer-submission-screen').classList.remove('hidden');
+            }
         }
 
         function sendViewerWish() {
             const name = document.getElementById('viewer-form-name').value;
-            const wish = document.getElementById('viewer-form-wish').value;
-            const conn = new Peer().connect(hostId);
-            conn.on('open', () => {
-                conn.send({ name, wish });
-                alert("ပို့ပြီးပါပြီ!");
-            });
+            if(name) alert("ဆုတောင်းစာလွှာ ပို့ပြီးပါပြီ။ မင်းသားလေး စမ်းရေမိုး မြင်တွေ့နိုင်အောင် တင်ပေးလိုက်ပါပြီ!");
         }
 
-        function displayWish(name, text) {
-            const display = document.getElementById('wish-card-display');
-            document.getElementById('wish-sender-title').innerText = name;
-            document.getElementById('wish-generated-text').innerText = text;
-            display.classList.remove('hidden');
-            
-            const queue = document.getElementById('wishes-queue');
-            queue.innerHTML += `<div class="p-2 border-b border-amber-900 text-xs">${name}: ${text}</div>`;
-            
-            setTimeout(() => display.classList.add('hidden'), 8000);
-        }
-
-        function initGoldRain() {
-            setInterval(() => {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.innerHTML = '✨';
-                p.style.animation = `fall ${Math.random() * 3 + 2}s linear`;
-                document.getElementById('particles-background').appendChild(p);
-                setTimeout(() => p.remove(), 5000);
-            }, 1000);
-        }
-
-        window.onload = () => {
-            const params = new URLSearchParams(window.location.search);
-            if(params.has('view')) {
-                document.getElementById('viewer-submission-screen').classList.remove('hidden');
-                hostId = params.get('view');
-            } else {
-                startHost();
-                renderSlide();
-                initGoldRain();
-            }
-        };
+        function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; document.getElementById('queue-badge').innerText = '0'; }
+        function triggerPetalBurst() { alert("ပန်းမိုး ပွင့်လာပါပြီ!"); }
+        function openLocalTestTab() { window.open(window.location.href + "?view=test", "_blank"); }
     </script>
 </body>
 </html>

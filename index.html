@@ -4,137 +4,856 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>စမ်းရေမိုး YouTube Live Celebration Hub</title>
+    <!-- Tailwind CSS for responsive and elegant styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for standard premium icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Pyidaungsu & Elegant Serif fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    <!-- PeerJS for WebRTC P2P communication -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+
     <style>
-        body { font-family: 'Pyidaungsu', sans-serif; background-color: #05020a; color: #fce8cc; }
-        .glass-panel { background: rgba(20, 10, 40, 0.6); border: 1px solid rgba(212, 175, 55, 0.3); backdrop-filter: blur(10px); }
-        .gold-glow { box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .wish-animation { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Pyidaungsu', 'Segoe UI', Roboto, sans-serif;
+            background: #090610;
+            color: #fce8cc;
+            overflow-x: hidden;
+        }
+        .royal-gold-gradient {
+            background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .royal-card-border {
+            border: 2px solid;
+            border-image: linear-gradient(to right, #8b6508, #FFE89C, #D4AF37, #8B6508) 1;
+        }
+        .royal-gold-button {
+            background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%);
+            color: #090610;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .royal-gold-button:hover {
+            background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .curtain-backdrop {
+            background: linear-gradient(90deg, #2b0307 0%, #110103 50%, #2b0307 100%);
+        }
+        /* Custom scrollbar configurations */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090610;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 4px;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg) translateX(0px);
+                opacity: 0;
+            }
+            15% { opacity: 0.9; }
+            90% { opacity: 0.9; }
+            100% {
+                transform: translateY(110vh) rotate(360deg) translateX(80px);
+                opacity: 0;
+            }
+        }
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .glass-panel {
+            background: rgba(15, 10, 25, 0.80);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-6">
+<body class="relative min-h-screen">
 
-    <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
-    </header>
+    <div id="particles-background" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="container mx-auto px-4 py-6 relative z-10">
         
-        <div class="lg:col-span-8 space-y-6">
-            <div id="display-area" class="glass-panel p-8 rounded-2xl h-[600px] flex flex-col gold-glow justify-center items-center text-center">
-                <div class="mb-4">
-                    <span class="text-xs uppercase tracking-widest text-[#D4AF37]">Live Presentation Screen</span>
-                </div>
-                <div id="content-container" class="space-y-4">
-                    <h2 class="text-3xl font-bold text-[#D4AF37]">ကြိုဆိုပါတယ်</h2>
-                    <p class="text-lg text-gray-400">ပရိသတ်များ၏ ဆုတောင်းစာများ ဤနေရာတွင် ပေါ်လာပါမည်။</p>
-                </div>
-            </div>
+        <!-- Header Title Banner -->
+        <header class="text-center mb-6">
+            <h1 class="text-2xl md:text-4xl font-extrabold royal-gold-gradient mb-1 tracking-wider font-serif">
+                ✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨
+            </h1>
+            <p class="text-amber-200/70 text-xs md:text-sm">
+                မြန်မာ့ရိုးရာသဘင်မင်းသားလေး မွေးနေ့ဂုဏ်ပြုပွဲ တိုက်ရိုက်ထုတ်လွှင့်မှု အလှဆင်စနစ်
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <div class="glass-panel p-4 rounded-xl flex gap-4 items-center overflow-x-auto">
-                <button class="bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37] px-4 py-2 rounded text-sm text-[#D4AF37]">ယခင်</button>
-                <button class="bg-[#D4AF37] text-black font-bold px-6 py-2 rounded text-sm">Auto-Play ▶</button>
-                <button class="bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37] px-4 py-2 rounded text-sm text-[#D4AF37]">နောက်</button>
+            <!-- Left Side - Stream Display Overlay Frame -->
+            <div class="lg:col-span-8 flex flex-col gap-5">
+                
+                <!-- Overlay Window Screen (OBS Source Target) -->
+                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/40 flex flex-col justify-between p-6 md:p-8 transition-all duration-500">
+                    
+                    <!-- Top Navigation Indicator -->
+                    <div class="flex justify-between items-start z-10 w-full">
+                        <div class="glass-panel px-3 py-1 rounded-full text-[10px] text-amber-300 flex items-center gap-2 border border-amber-500/30">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+                            <span>LIVE PRESENTATION SCREEN</span>
+                        </div>
+                        <div class="glass-panel px-3 py-1 rounded-full text-[10px] text-amber-200 border border-amber-500/30 font-serif">
+                            🎂 Happy Birthday မင်းသားလေး စမ်းရေမိုး
+                        </div>
+                    </div>
+
+                    <!-- Center Carousel Screen Content -->
+                    <div class="my-auto text-center z-10 max-w-2xl mx-auto flex flex-col justify-center items-center py-2">
+                        <!-- Standard Slide Layout -->
+                        <div id="slide-display-area" class="transition-all duration-300 transform scale-100 opacity-100">
+                            <h2 class="text-xl md:text-3xl font-bold text-amber-100 mb-3 font-serif leading-relaxed" id="slide-title">
+                                စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်နှင့် ကမ္ဘာ့စင်မြင့်ဆီသို့
+                            </h2>
+                            <p class="text-xs md:text-base text-amber-200/90 leading-loose text-justify md:text-center px-4" id="slide-content">
+                                ခေတ်ရေစီးကြောင်းတွေ မည်သို့ပင် ပြောင်းလဲနေပါစေ... မိမိတို့ရဲ့ ရိုးရာယဉ်ကျေးမှု ဇာတ်သဘင်အနုပညာကို မြတ်နိုးတန်ဖိုးထားတဲ့ ပရိသတ်တွေရဲ့ ရင်ထဲမှာ အမြဲတမ်း ရှင်သန်တောက်ပနေတဲ့ ကြယ်ပွင့်တစ်ပွင့် ရှိပါတယ်။
+                            </p>
+                        </div>
+
+                        <!-- Real-time Wish Submissions Panel -->
+                        <div id="wish-card-display" class="hidden transform scale-95 opacity-0 transition-all duration-500 w-full bg-black/40 p-5 rounded-xl border border-amber-500/30 relative">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-0.5 bg-amber-600 rounded-full text-[10px] font-bold text-black uppercase tracking-wider">
+                                ပရိသတ် မွေးနေ့ဆုတောင်း
+                            </div>
+                            <h3 class="text-base md:text-xl font-bold text-amber-300 mb-2 font-serif" id="wish-sender-title">
+                                မောင်မောင် မှ ရိုသေစွာဖြင့် ဆုမွန်ကောင်းတောင်းအပ်ပါသည်။
+                            </h3>
+                            <p class="text-xs md:text-base text-white/95 italic leading-relaxed" id="wish-generated-text">
+                                "သီရိသုဓမ္မ မင်္ဂလာအပေါင်းနှင့် ပြည့်စုံပါစေကြောင်းနှင့် စမ်းရေမိုး မင်းသားလေး သက်တော်ရာကျော် ရှည်ပါစေကြောင်း ဆုတောင်းအပ်ပါသည်ဗျာ။"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Branding Info -->
+                    <div class="flex justify-between items-center z-10 w-full border-t border-amber-500/20 pt-2.5">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-300 text-xs">
+                                <i class="fa-solid fa-masks-theater"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-amber-300 font-semibold">သဘင်မင်းသားလေး စမ်းရေမိုး</span>
+                        </div>
+                        <div class="text-[9px] md:text-xs text-amber-400/60">
+                            #SanYayMoeBirthday2026
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Panels for Slides & Visual Tweaks -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Slides Controller Box -->
+                    <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                        <h3 class="text-amber-300 text-sm font-semibold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-photo-film"></i> ဂုဏ်ပြုဆောင်းပါး တင်ဆက်မှုစနစ်
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="prevSlide()" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded text-xs transition">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> ယခင်တစ်ပုဒ်
+                            </button>
+                            <button id="btn-auto-play" onclick="toggleAutoPlay()" class="px-2.5 py-1 bg-green-700/20 hover:bg-green-700/30 text-green-300 rounded text-xs transition font-semibold">
+                                <i class="fa-solid fa-play mr-1"></i> Auto-Play
+                            </button>
+                            <button onclick="nextSlide()" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded text-xs transition">
+                                နောက်တစ်ပုဒ် <i class="fa-solid fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2.5 text-[10px] text-amber-400/50" id="slide-index-indicator">
+                            အပိုင်း - ၁ / ၅ ပြသနေသည်
+                        </div>
+                    </div>
+
+                    <!-- Ambient Effects Controls -->
+                    <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                        <h3 class="text-amber-300 text-sm font-semibold mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders"></i> စင်မြင့် နောက်ခံ သက်ရောက်မှုများ
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="triggerPetalBurst()" class="px-2.5 py-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 rounded text-xs transition">
+                                🌸 ပန်းမိုးရွာချရန်
+                            </button>
+                            <button onclick="toggleGoldRain()" id="btn-gold-rain" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded text-xs transition">
+                                ✨ ရွှေမိုး (ဖွင့်ထား)
+                            </button>
+                            <button onclick="toggleChromaMode()" id="btn-chroma" class="px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition font-semibold">
+                                <i class="fa-solid fa-eye-slash mr-1"></i> OBS Overlay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <div class="lg:col-span-4 flex flex-col gap-5">
+
+                <!-- Instant QR Generator Container (For real-time user inputs) -->
+                <div class="glass-panel p-5 rounded-xl border-2 border-amber-500/40 relative overflow-hidden">
+                    <h2 class="text-lg font-bold text-amber-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-qrcode text-amber-400 animate-pulse"></i> ပရိသတ်တိုက်ရိုက်ပေးပို့စနစ်
+                    </h2>
+                    <p class="text-[11px] text-amber-100/70 mb-4 leading-relaxed">
+                        အောက်ပါ QR Code ကို ဖုန်းဖြင့် Scan ဖတ်ပြီး ပရိသတ်များက ၎င်းတို့၏အမည်များဖြင့် ဆုတောင်းများကို တိုက်ရိုက်ရိုက်ထည့် ပေးပို့နိုင်ပါသည်။
+                    </p>
+
+                    <!-- Realtime QR Code Display Area -->
+                    <div class="flex flex-col items-center bg-black/40 p-4 rounded-lg border border-amber-500/20 mb-3">
+                        <div id="qrcode-wrapper" class="p-2 bg-white rounded-lg inline-block mb-3">
+                            <img id="qr-image" src="" alt="Live QR Code" class="w-[120px] h-[120px] block" onerror="this.src='https://placehold.co/120x120/ffffff/000000?text=Scan+QR'">
+                        </div>
+                        <!-- Network Connection Status indicator -->
+                        <div id="connection-status" class="text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-amber-950/50 text-amber-400 border border-amber-500/20">
+                            ကွန်ရက်သို့ ချိတ်ဆက်နေဆဲ...
+                        </div>
+                    </div>
+
+                    <!-- Direct URL sharing settings -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] text-amber-400 uppercase tracking-wider">တိုက်ရိုက်ချိတ်ဆက်ရန် Link</label>
+                            <div class="flex gap-1.5">
+                                <input id="share-link-input" type="text" readonly class="bg-black/60 border border-amber-500/20 text-xs px-2 py-1 rounded text-amber-200 flex-grow text-ellipsis overflow-hidden select-all" value="ဖန်တီးနေဆဲ...">
+                                <button onclick="copyShareLink()" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 rounded text-xs transition">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sandbox Host Testing Utility -->
+                        <div id="file-warning-box" class="mt-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded text-[10px] text-amber-300 leading-normal flex flex-col gap-1.5">
+                            <span>💡 <b>ကွန်ပျူတာထဲမှာပဲ ကိုယ်တိုက်စမ်းချင်ရင်:</b> အောက်က စမ်းသပ်ရန်ခလုတ်ကို နှိပ်ပြီး Browser အသစ်တစ်ခု ဖွင့်ကာ နာမည်လှမ်းပို့စမ်းသပ်နိုင်ပါတယ်။</span>
+                            <button onclick="openLocalTestTab()" class="w-full py-1 bg-amber-500 text-black font-bold rounded text-[9px] hover:bg-white transition uppercase tracking-wider">
+                                <i class="fa-solid fa-up-right-from-square mr-1"></i> စမ်းသပ်ရန် Viewer Window ဖွင့်မည်
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Submissions Queue -->
+                <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-envelope-open-text"></i> ရောက်ရှိလာသော ဆုတောင်းများ
+                            <span id="queue-badge" class="bg-amber-500 text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">0</span>
+                        </h3>
+                        <button onclick="clearQueue()" class="text-[10px] text-rose-400 hover:text-rose-300 hover:underline">
+                            အကုန်ဖျက်ရန်
+                        </button>
+                    </div>
+
+                    <!-- Queue List container -->
+                    <div id="wishes-queue" class="max-h-[180px] overflow-y-auto space-y-2 pr-1">
+                        <!-- Empty queue state message -->
+                        <div id="empty-queue-msg" class="text-center py-6 text-[11px] text-amber-400/40 italic">
+                            <i class="fa-regular fa-comments text-lg mb-1.5 block"></i>
+                            ပရိသတ်များထံမှ ဆုတောင်းစာလွှာ စောင့်ဆိုင်းနေပါသည်...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tools / Manual Submission Form -->
+                <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
+                    <div class="flex justify-between items-center mb-2.5">
+                        <h4 class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Admin Panel (ကိုယ်တိုင်ရိုက်ထည့်ရန်)</h4>
+                        <button onclick="toggleSettings()" class="text-amber-400 hover:text-amber-300 transition text-xs">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex gap-1.5">
+                        <input id="manual-name" type="text" placeholder="ပရိသတ်အမည် (ဥပမာ- ရွှေရည်ဦး)" class="bg-black/40 border border-amber-500/20 rounded px-2.5 py-1 text-xs text-amber-100 placeholder-amber-500/40 flex-grow focus:outline-none">
+                        <button onclick="submitManualWish()" class="px-3 py-1 royal-gold-button rounded text-xs">
+                            ဖန်တီးရန်
+                        </button>
+                    </div>
+
+                    <!-- Settings Panel (Toggled internally) -->
+                    <div id="settings-panel" class="hidden mt-3 pt-3 border-t border-amber-500/20 space-y-2.5">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] text-amber-400">Google Gemini API Key (Optional)</label>
+                            <input id="api-key-input" type="password" placeholder="AI ဆုတောင်းအတွက် API Key ထည့်ရန်" class="bg-black/50 border border-amber-500/20 rounded px-2.5 py-1 text-xs text-amber-100 placeholder-amber-500/40 focus:outline-none">
+                            <span class="text-[9px] text-amber-400/50 leading-normal">
+                                API Key မထည့်ပါက Built-in ရိုးရာနမူနာဆုတောင်းများကိုသာ အလိုအလျောက် သုံးပါမည်။
+                            </span>
+                        </div>
+                        <button onclick="saveApiKey()" class="w-full py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded text-[10px] font-semibold">
+                            API Key သိမ်းဆည်းမည်
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="lg:col-span-4 space-y-6">
-            <!-- QR Section -->
-            <div class="glass-panel p-6 rounded-2xl text-center">
-                <h3 class="font-bold text-[#D4AF37] mb-4">Viewer Control</h3>
-                <button onclick="openViewer()" class="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-lg text-sm hover:brightness-110 transition">💻 VIEWER WINDOW ဖွင့်မည်</button>
-            </div>
+    </div>
 
-            <!-- Admin Panel -->
-            <div class="glass-panel p-6 rounded-2xl">
-                <h3 class="font-bold text-[#D4AF37] mb-4">ADMIN PANEL</h3>
-                <div class="space-y-3">
-                    <input id="api-key" type="password" placeholder="Gemini API Key (Optional)" class="w-full bg-black/50 border border-[#D4AF37]/30 p-3 rounded text-sm text-white focus:outline-none">
-                    <input id="fan-name" placeholder="ပရိသတ်အမည် (ဥပမာ- ရွှေရည်)" class="w-full bg-black/50 border border-[#D4AF37]/30 p-3 rounded text-sm text-white focus:outline-none">
-                    <textarea id="fan-wish" placeholder="ဆုတောင်းစာ..." class="w-full bg-black/50 border border-[#D4AF37]/30 p-3 rounded text-sm text-white focus:outline-none h-24"></textarea>
-                    <button onclick="processWish()" class="w-full bg-[#D4AF37] text-black font-bold py-2 rounded text-sm hover:brightness-110">ပေးပို့ရန်</button>
+    <div id="viewer-submission-screen" class="hidden fixed inset-0 z-50 bg-[#07050a] text-[#fce8cc] p-6 flex flex-col justify-between overflow-y-auto">
+        <header class="text-center pb-4 border-b border-amber-500/20">
+            <h1 class="text-xl font-bold royal-gold-gradient font-serif">မင်းသားလေး စမ်းရေမိုး မွေးနေ့ပွဲ</h1>
+            <p class="text-[10px] text-amber-300/80">မွေးနေ့ဆုတောင်းစာလွှာ တိုက်ရိုက်ပေးပို့ရန်စာမျက်နှာ</p>
+        </header>
+
+        <main class="my-auto max-w-sm mx-auto w-full py-6 space-y-4">
+            <!-- Custom Dynamic Message box on viewer form (Replaces alerts) -->
+            <div id="viewer-message-box" class="hidden p-3 rounded-lg text-xs font-semibold text-center transition-all duration-300"></div>
+
+            <div class="bg-amber-500/5 p-4 rounded-xl border border-amber-500/15 space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-amber-300">၁။ သင်၏ အမည်ကို ရိုက်ထည့်ပါ</label>
+                    <input id="viewer-form-name" type="text" placeholder="ဥပမာ- ကိုမောင်မောင်၊ မသီတာ" class="w-full bg-black/40 border border-amber-500/20 rounded-lg p-2.5 text-xs text-amber-100 placeholder-amber-500/30 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold text-amber-300">၂။ ဆုတောင်းပုံစံ ရွေးချယ်ပါ</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="selectStyle('royal')" id="style-btn-royal" class="py-2 px-3 bg-amber-500/20 border border-amber-500/40 rounded-lg text-[11px] text-amber-200 transition font-semibold">
+                            👑 နန်းဆန်ဆန် စတိုင်လ်
+                        </button>
+                        <button type="button" onclick="selectStyle('poetic')" id="style-btn-poetic" class="py-2 px-3 bg-black/40 border border-white/5 rounded-lg text-[11px] text-amber-200/50 transition">
+                            📝 ကဗျာဆန်ဆန် စတိုင်လ်
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <button id="viewer-submit-btn" onclick="sendViewerWish()" class="w-full py-3 royal-gold-button rounded-xl text-xs font-bold shadow-lg flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i> ဆုတောင်းစာလွှာ ပို့မည်
+            </button>
+        </main>
+
+        <footer class="text-center pt-4 border-t border-amber-500/10 text-[9px] text-amber-400/40">
+            © 2026 မင်းသားလေး စမ်းရေမိုး အနုပညာဝန်းရံသူများအဖွဲ့
+        </footer>
+    </div>
+
+    <!-- UI SFX Elements -->
+    <audio id="bell-chime" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav" preload="auto"></audio>
+
+    <!-- Global Floating Toast Notification Container -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 transition-all duration-300 bg-amber-500 text-black px-4 py-2 rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 pointer-events-none">
+        <i class="fa-solid fa-bell"></i>
+        <span id="toast-message">အသိပေးချက်</span>
+    </div>
 
     <script>
-        
-        // Listen for storage updates
-        window.addEventListener('storage', (e) => {
-            if(e.key === 'live_wish') {
-                updateDisplay(JSON.parse(e.newValue));
+        const slidesData = [
+            {
+                title: "စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်နှင့် ကမ္ဘာ့စင်မြင့်ဆီသို့ ချီတက်ခြင်း",
+                content: "ခေတ်ရေစီးကြောင်းတွေ ဘယ်လိုပင် ပြောင်းလဲနေပါစေ... မိမိတို့ရဲ့ ရိုးရာယဉ်ကျေးမှု ဇာတ်သဘင်အနုပညာကို မြတ်နိုးတန်ဖိုးထားတဲ့ ပရိသတ်တွေရဲ့ ရင်ထဲမှာ အမြဲတမ်း ရှင်သန်တောက်ပနေတဲ့ ကြယ်ပွင့်တစ်ပွင့် ရှိပါတယ်။ အဲဒီကြယ်ပွင့်ကတော့ အခြားသူမဟုတ်ပါဘူး... သျှင်သျှင်နုနု၊ ယဉ်ယဉ်ကျေးကျေးနဲ့ ရိုးရာအကအလှတွေကို ဖော်ဆောင်ပြီး ပရိသတ်တွေကို ဆွဲဆောင်ထားနိုင်တဲ့ မင်းသားလေး စမ်းရေမိုး ပဲ ဖြစ်ပါတယ်။"
+            },
+            {
+                title: "မင်္ဂလာရှိလှသော ဇူလိုင်မွေးနေ့ရက်မြတ်",
+                content: "ဒီနေ့ ဇူလိုင်လရဲ့ ထူးခြားမင်္ဂလာရှိလှတဲ့ နေ့ရက်ဟာ မင်းသားလေး စမ်းရေမိုး ရဲ့ မွေးနေ့ရက်မြတ် ဖြစ်ပါတယ်။ ဤမွေးနေ့အချိန်အခါသမယမှာ အနုပညာကို အသက်ထက်တန်ဖိုးထားတဲ့ မင်းသားလေးအတွက် အကောင်းဆုံးသော ဂုဏ်ပြုလက်ဆောင်အဖြစ် ဤဆောင်းပါးကို ရေးသားတင်ဆက်လိုက်ရခြင်း ဖြစ်ပါတယ်။"
+            },
+            {
+                title: "🎭 ရိုးရာကို အသက်သွင်းသူနှင့် အနှိုင်းမဲ့ဝါသနာ",
+                content: "မင်းသားလေး စမ်းရေမိုး ရဲ့ စင်မြင့်ထက်က ကကွက်တိုင်း၊ ခြေလှမ်းတိုင်းနဲ့ အပြုံးတိုင်းဟာ ရိုးရိုးလေးနဲ့ ဆန်းပြားလွန်းလှပါတယ်။ ဇာတ်သဘင်လောကမှာ ကိုယ်ပိုင် Signature အလှတရားတွေနဲ့ ပရိသတ်ရဲ့ အသည်းကို ဖမ်းစားနိုင်ခြင်းဟာ ပါရမီတင်မကဘဲ ပြင်းပြတဲ့ ဝါသနာနဲ့ ကြိုးစားမှုတွေကြောင့် ဖြစ်ပါတယ်။"
+            },
+            {
+                title: "🌍 ယူနက်စကို (UNESCO) ခရီးစဉ်နှင့် ကမ္ဘာ့စင်မြင့်ဆီသို့",
+                content: "မင်းသားလေး စမ်းရေမိုး ရဲ့ ရည်မှန်းချက်ဟာ ပြည်တွင်းစင်မြင့်ထက်တင် ရပ်တန့်မနေပါဘူး။ မြန်မာ့ရိုးရာဇာတ်သဘင် အနုပညာကို ကမ္ဘာ့အလယ်မှာ ဂုဏ်တင့်စေဖို့နဲ့ ယူနက်စကို (UNESCO) ကမ္ဘာ့အမွေအနှစ်စာရင်းဝင် ဖြစ်စေဖို့အတွက် ရည်မှန်းချက်ကြီးမားစွာနဲ့ ချီတက်နေတာ ဖြစ်ပါတယ်။"
+            },
+            {
+                title: "🤝 စစ်မှန်သော မေတ္တာနှင့် ဝန်းရံမှုများ",
+                content: "ဒီနေ့ မွေးနေ့ကစပြီး ဝေဖန်တိုက်ခိုက်မှု အမှောင်ထုတွေကို ဘေးဖယ်ကာ၊ မင်းသားလေးကို ချစ်ခင်မြတ်နိုးတဲ့ ပရိသတ်တွေရဲ့ စုစည်းညီညွတ်တဲ့ အချစ်တွေ၊ ပန်းကုံးတွေဟာ မင်းသားလေးရဲ့ ဘဝလမ်းခရီးအတွက် အခိုင်မာဆုံးသော အကာအကွယ် အချစ်သရဖူတွေ ဖြစ်လာပါလိမ့်မယ်။"
             }
+        ];
+
+        const localWishes = {
+            royal: [
+                "မင်္ဂလာအပေါင်းနှင့် ပြည့်စုံတော်မူလှသော မင်းသားလေး စမ်းရေမိုး၊ ဤမွေးနေ့ရက်မြတ်မှစ၍ ဘဝတစ်လျှောက်လုံး ရတနာရွှေမိုးများ ရွာသွန်းဖြိုးသကဲ့သို့ စည်းစိမ်ချမ်းသာ တိုးပွားပါစေသော်ဝ်။",
+                "မင်းသားလေး စမ်းရေမိုး၊ စင်မြင့်ထက်ဝယ် သမိုင်းမှတ်တိုင်သစ်များစွာကို ထူထောင်နိုင်ပါစေကြောင်းနှင့် ရတနာသုံးပါး၏ စောင့်ရှောက်မှုဖြင့် ဘေးအန္တရာယ်ဟူသမျှ ကင်းဝေးပါစေသော်ဝ်။",
+                "မင်းသားလေး၏ ကမ္ဘာ့အမွေအနှစ် (UNESCO) ခရီးစဉ်ကြီး အောင်မြင်မှုသရဖူ ဆောင်းနိုင်ပါစေကြောင်းနှင့် တုနှိုင်းမရသော သဘင်အရှင်သခင်အဖြစ် ကမ္ဘာတည်သရွေ့ ဂုဏ်တင့်ပါစေ။"
+            ],
+            poetic: [
+                "ရွှေဝတ်ဆံ လွင့်ပျံသည့် ဇူလိုင်ရက်မြတ်၊ သဘင်မင်းသားလေး စမ်းရေမိုး စိတ်၏ချမ်းသာခြင်း၊ ကိုယ်၏ကျန်းမာခြင်း အပြည့်ဖြင့် အသက်ရာကျော် ရှည်ပါစေကြောင်း။",
+                "ကကွက်အလှတို့ဖြင့် ကမ္ဘာ့အလယ် မြန်မာ့ဇာတ်သဘင်ကို ဆွဲတင်မည့် ကြယ်ပွင့်လေး စမ်းရေမိုး၊ ဆန့်ကျင်ဘက် အမှောင်ထုမှန်သမျှ မေတ္တာအလင်းဖြင့် အောင်နိုင်ပါစေ။",
+                "အောင်ခြင်းရှစ်ပါး မင်္ဂလာတရားများဖြင့် ဘဝလမ်းတစ်လျှောက် အဆို့အတားဟူသမျှကို ရေလိုအေး၊ ပန်းလိုမွှေးကာ အေးချမ်းသာယာစွာ အောင်မြင်ကျော်လွှားနိုင်ပါစေ။"
+            ]
+        };
+
+        // UI & Connection Properties
+        let currentSlideIndex = 0;
+        let autoPlayTimer = null;
+        let goldRainActive = true;
+        let goldRainInterval = null;
+        let peer = null;
+        let wishesQueue = [];
+        let selectedViewerStyle = 'royal';
+        let chromaModeActive = false;
+        let generatedChannelId = '';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                document.getElementById('api-key-input').value = savedKey;
+            }
+
+            // Immediately display local channel links and static QR codes to prevent delay
+            generateLocalChannelId();
+            // Start gold rain particle loops
+            initGoldRain();
+            // Show initial slide details
+            renderSlide();
+            // Fire up WebRTC network interfaces
+            initCommunication();
+            // Run view controller check
+            checkIfViewer();
         });
 
-        function updateDisplay(data) {
-            const container = document.getElementById('content-container');
-            container.innerHTML = `
-                <div class="wish-animation">
-                    <p class="text-sm text-[#D4AF37] mb-2">မှ - ${data.name}</p>
-                    <h3 class="text-3xl font-bold text-white mb-6">"${data.wish}"</h3>
-                </div>
-            `;
+        // 1. Instant Static QR Code Generation (No script dependencies, 100% reliable load)
+        function generateLocalChannelId() {
+            generatedChannelId = 'sanyaymoe-' + Math.random().toString(36).substring(2, 9);
+            
+            const baseUrl = window.location.href.split('?')[0];
+            const viewerLink = `${baseUrl}?viewMode=true&channel=${generatedChannelId}`;
+            
+            document.getElementById('share-link-input').value = viewerLink;
+
+            // Generate clean Image Source URL from a highly reliable cloud QR server
+            const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(viewerLink)}`;
+            document.getElementById('qr-image').src = qrImgUrl;
         }
 
-        async function processWish() {
-            const name = document.getElementById('fan-name').value;
-            const wishText = document.getElementById('fan-wish').value;
-            const key = document.getElementById('api-key').value;
+        // 2. PeerJS networking setup with custom channel IDs
+        function initCommunication() {
+            const statusEl = document.getElementById('connection-status');
+            
+            peer = new Peer(generatedChannelId);
 
-            if(!name) { alert("အမည်ဖြည့်ပေးပါ"); return; }
+            peer.on('open', (id) => {
+                statusEl.innerText = "🌐 Connected! Network Active";
+                statusEl.className = "text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-green-950/50 text-green-400 border border-green-500/20";
+            });
 
-            let finalWish = wishText;
+            peer.on('connection', (conn) => {
+                conn.on('data', (data) => {
+                    if (data && data.type === 'WISH_SUBMIT') {
+                        handleIncomingWish(data.name, data.style);
+                    }
+                });
+            });
 
-            // If API key exists and no custom wish, generate one
-            if(key && !wishText) {
-                try {
-                    const prompt = `Write a short, warm Burmese birthday wish for a fan named ${name} to a performer named San Yay Moe.`;
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${key}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
-                    const data = await response.json();
-                    finalWish = data.candidates[0].content.parts[0].text;
-                } catch(e) {
-                    finalWish = "မွေးနေ့မှာ ကျန်းမာချမ်းသာပါစေဗျာ။";
-                }
-            } else if (!wishText) {
-                finalWish = "မွေးနေ့မှာ ပျော်ရွှင်ပါစေဗျာ။";
+            peer.on('error', (err) => {
+                console.error("Peer network failure:", err);
+                statusEl.innerText = "⚠️ Peer Offline. Reconnecting...";
+                statusEl.className = "text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-amber-950/50 text-amber-400 border border-amber-500/20";
+                setTimeout(initCommunication, 6000); // Retry reconnect loop
+            });
+        }
+
+        // 3. Carousel Slideshow Navigation Rules
+        function renderSlide() {
+            const slideArea = document.getElementById('slide-display-area');
+            const wishCard = document.getElementById('wish-card-display');
+            
+            wishCard.classList.add('hidden');
+            slideArea.classList.remove('hidden');
+
+            const currentSlide = slidesData[currentSlideIndex];
+            document.getElementById('slide-title').innerText = currentSlide.title;
+            document.getElementById('slide-content').innerText = currentSlide.content;
+            
+            document.getElementById('slide-index-indicator').innerText = `အပိုင်း - ${currentSlideIndex + 1} / ${slidesData.length} ပြသနေသည်`;
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slidesData.length;
+            renderSlide();
+        }
+
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + slidesData.length) % slidesData.length;
+            renderSlide();
+        }
+
+        function toggleAutoPlay() {
+            const btn = document.getElementById('btn-auto-play');
+            if (autoPlayTimer) {
+                clearInterval(autoPlayTimer);
+                autoPlayTimer = null;
+                btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Auto-Play';
+                btn.className = "px-2.5 py-1 bg-green-700/20 hover:bg-green-700/30 text-green-300 rounded text-xs transition font-semibold";
+                showToast("Auto-Play ရပ်တန့်လိုက်ပါပြီ");
+            } else {
+                autoPlayTimer = setInterval(nextSlide, 8000);
+                btn.innerHTML = '<i class="fa-solid fa-pause mr-1"></i> Pause';
+                btn.className = "px-2.5 py-1 bg-rose-700/30 hover:bg-rose-700/40 text-rose-300 rounded text-xs transition font-semibold animate-pulse";
+                showToast("Auto-Play စတင်လည်ပတ်နေပါသည်");
+            }
+        }
+
+        function handleIncomingWish(name, style) {
+            playChime();
+
+            const newWish = {
+                id: Date.now(),
+                name: name,
+                style: style || 'royal',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            wishesQueue.push(newWish);
+            updateQueueUI();
+            
+            showToast(`📨 ပရိသတ် ${name} ထံမှ ဆုတောင်းတစ်ခု ရောက်ရှိလာပါပြီ`);
+        }
+
+        function updateQueueUI() {
+            const queueList = document.getElementById('wishes-queue');
+            const emptyMsg = document.getElementById('empty-queue-msg');
+            const badge = document.getElementById('queue-badge');
+
+            badge.innerText = wishesQueue.length;
+
+            if (wishesQueue.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                const items = queueList.querySelectorAll('.queue-item');
+                items.forEach(item => item.remove());
+                return;
             }
 
-            const payload = { name, wish: finalWish };
-            localStorage.setItem('live_wish', JSON.stringify(payload));
-            updateDisplay(payload);
+            emptyMsg.classList.add('hidden');
+            const existingItems = queueList.querySelectorAll('.queue-item');
+            existingItems.forEach(item => item.remove());
+
+            wishesQueue.forEach((wish) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "queue-item glass-panel p-2.5 rounded-lg border border-amber-500/15 hover:border-amber-400/50 transition flex justify-between items-center cursor-pointer";
+                itemDiv.onclick = () => selectAndGenerateLiveWish(wish.id);
+                itemDiv.innerHTML = `
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-amber-200">${wish.name}</span>
+                            <span class="text-[8px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded">
+                                ${wish.style === 'royal' ? '👑 နန်းဆန်' : '📝 ကဗျာဆန်'}
+                            </span>
+                        </div>
+                        <p class="text-[9px] text-amber-400/40 mt-0.5">လှမ်းပို့ချိန် - ${wish.time}</p>
+                    </div>
+                    <button class="px-2 py-1 bg-amber-500 text-black rounded hover:bg-white transition text-[9px] font-bold">
+                        Overlay တင်ရန်
+                    </button>
+                `;
+                queueList.appendChild(itemDiv);
+            });
         }
 
-        function openViewer() {
-            window.open(window.location.href, "_blank", "width=800,height=600");
-        }
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "your-project-id.firebaseapp.com",
-    databaseURL: "https://your-project-id-default-rtdb.firebaseio.com", // ဤနေရာတွင် အမှန်ထည့်ပါ
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:xxxxxx"
-};
-        function updateDisplay(data) {
-            document.getElementById('display-name').innerText = `မှ - ${data.name}`;
-            document.getElementById('display-wish').innerText = `"${data.wish}"`;
+        function selectAndGenerateLiveWish(wishId) {
+            const wish = wishesQueue.find(w => w.id === wishId);
+            if (!wish) return;
+
+            generateWishText(wish.name, wish.style);
+            wishesQueue = wishesQueue.filter(w => w.id !== wishId);
+            updateQueueUI();
         }
 
-        // ဒီ Function လေးကို ထည့်ပါ
-        function toggleOverlay() {
-            const content = document.getElementById('main-content');
-            // အပေါ်က Input Section ကို ဖျောက်ပြီး Presentation ကိုပဲ ချဲ့ပြပေးပါမယ်
-            content.classList.toggle('hidden');
-            // Overlay အတွက် Background တစ်ခု သီးခြား ဖန်တီးပေးပါ
+        async function generateWishText(name, style) {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            const slideArea = document.getElementById('slide-display-area');
+            const wishCard = document.getElementById('wish-card-display');
+            const wishSender = document.getElementById('wish-sender-title');
+            const wishContent = document.getElementById('wish-generated-text');
+
+            slideArea.classList.add('hidden');
+            wishCard.classList.remove('hidden');
+            wishCard.classList.add('flex');
+            wishSender.innerText = `${name} မှ ဂုဏ်ပြုဆုမွန်ကောင်းတောင်းအပ်ပါသည်။`;
+            wishContent.innerHTML = `<span class="animate-pulse"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-400"></i> AI က ဆုတောင်းစာသား သီကုံးနေပါသည်...</span>`;
+
+            if (apiKey) {
+                try {
+                    const wishPrompt = `Write a beautiful traditional Burmese birthday wish for a famous young classical male dancer named "မင်းသားလေး စမ်းရေမိုး" (Prince San Yay Moe) on behalf of a fan named "${name}". 
+                    The style should be "${style === 'royal' ? 'Royal, highly formal Burmese (နန်းဆန်ဆန် စတိုင်လ်)' : 'Poetic, literary, artistic Burmese (ကဗျာဆန်ဆန် စတိုင်လ်)'}". 
+                    Include references to blessings, success in his UNESCO endeavors, art, and long life. Make it refined, elegant, and culturally accurate. 
+                    Keep the response concise (2-3 sentences max). Do not include any english explanations, just provide the Burmese wish text wrapped in elegant quotation marks.`;
+
+                    let responseText = await fetchGeminiWithBackoff(apiKey, wishPrompt);
+                    wishContent.innerText = responseText;
+                    triggerPetalBurst();
+                    return;
+                } catch (error) {
+                    console.error("Gemini failed, switching to local bank.", error);
+                }
+            }
+
+            // Fallback Engine triggers instantly
+            setTimeout(() => {
+                const presets = localWishes[style] || localWishes.royal;
+                const randomIndex = Math.floor(Math.random() * presets.length);
+                const rawWish = presets[randomIndex];
+                wishContent.innerText = `"${rawWish}"`;
+                triggerPetalBurst();
+            }, 800);
+        }
+
+        async function fetchGeminiWithBackoff(apiKey, prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) return text.trim();
+            }
+            throw new Error("API call error");
+        }
+
+        // Local Sandbox window manager
+        function openLocalTestTab() {
+            const localLink = document.getElementById('share-link-input').value;
+            window.open(localLink, '_blank');
+            showToast("စမ်းသပ်ရန် Viewer Window အသစ်တစ်ခု ဖွင့်လိုက်ပါပြီ");
+        }
+
+        function checkIfViewer() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isViewMode = urlParams.get('viewMode');
+            const channelId = urlParams.get('channel');
+
+            if (isViewMode === 'true' && channelId) {
+                document.getElementById('viewer-submission-screen').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                window.channelConnectionId = channelId;
+            }
+        }
+
+        function selectStyle(style) {
+            selectedViewerStyle = style;
+            const btnRoyal = document.getElementById('style-btn-royal');
+            const btnPoetic = document.getElementById('style-btn-poetic');
+
+            if (style === 'royal') {
+                btnRoyal.className = "py-2 px-3 bg-amber-500/20 border border-amber-500 rounded-lg text-[11px] text-amber-200 font-bold transition";
+                btnPoetic.className = "py-2 px-3 bg-black/40 border border-white/5 rounded-lg text-[11px] text-amber-200/50 transition";
+            } else {
+                btnPoetic.className = "py-2 px-3 bg-amber-500/20 border border-amber-500 rounded-lg text-[11px] text-amber-200 font-bold transition";
+                btnRoyal.className = "py-2 px-3 bg-black/40 border border-white/5 rounded-lg text-[11px] text-amber-200/50 transition";
+            }
+        }
+
+        function sendViewerWish() {
+            const name = document.getElementById('viewer-form-name').value.trim();
+            const msgBox = document.getElementById('viewer-message-box');
+            const submitBtn = document.getElementById('viewer-submit-btn');
+
+            if (!name) {
+                showViewerMessage("ကျေးဇူးပြု၍ သင်၏အမည်ကို အရင်ရိုက်ထည့်ပေးပါဗျာ။", "error");
+                return;
+            }
+
+            if (!window.channelConnectionId) {
+                showViewerMessage("မွေးနေ့တိုက်ရိုက်လွှင့်ဆာဗာသို့ ချိတ်ဆက်မှုပြတ်တောက်နေပါသည်။ နောက်မှပြန်ကြိုးစားပါ။", "error");
+                return;
+            }
+
+            // Disable submit button during active connection
+            submitBtn.disabled = true;
+            submitBtn.innerText = "ပို့ဆောင်နေပါသည်...";
+
+            const viewerPeer = new Peer();
+            viewerPeer.on('open', () => {
+                const conn = viewerPeer.connect(window.channelConnectionId);
+                
+                // Set safety timeout for connections
+                const timeoutId = setTimeout(() => {
+                    showViewerMessage("ချိတ်ဆက်မှု ကြာမြင့်နေပါသည်။ ထပ်မံကြိုးစားကြည့်ပါ။", "error");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ဆုတောင်းစာလွှာ ပို့မည်';
+                    viewerPeer.destroy();
+                }, 5000);
+
+                conn.on('open', () => {
+                    clearTimeout(timeoutId);
+                    conn.send({
+                        type: 'WISH_SUBMIT',
+                        name: name,
+                        style: selectedViewerStyle
+                    });
+                    
+                    showViewerMessage(`ကျေးဇူးတင်ရှိပါသည် ${name} ဗျာ။ သင်၏မွေးနေ့ဆုတောင်းလွှာကို မင်းသားလေးထံ တိုက်ရိုက်ပေးပို့လိုက်ပါပြီ။`, "success");
+                    
+                    setTimeout(() => {
+                        viewerPeer.destroy();
+                        document.getElementById('viewer-form-name').value = '';
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ဆုတောင်းစာလွှာ ပို့မည်';
+                    }, 1000);
+                });
+            });
+        }
+
+        // Display beautiful in-app notifications inside the viewer screen layout (Safe from popup blocks)
+        function showViewerMessage(text, type) {
+            const msgBox = document.getElementById('viewer-message-box');
+            msgBox.innerText = text;
+            msgBox.classList.remove('hidden');
+
+            if (type === 'success') {
+                msgBox.className = "p-3 rounded-lg text-xs font-bold text-center bg-green-500/20 text-green-300 border border-green-500/40 mb-3";
+            } else {
+                msgBox.className = "p-3 rounded-lg text-xs font-bold text-center bg-rose-500/20 text-rose-300 border border-rose-500/40 mb-3";
+            }
+
+            setTimeout(() => {
+                msgBox.classList.add('hidden');
+            }, 6000);
+        }
+
+        function initGoldRain() {
+            if (goldRainInterval) clearInterval(goldRainInterval);
+            goldRainInterval = setInterval(() => {
+                if (!goldRainActive) return;
+                createParticle('✨', 'rgba(255, 215, 0, 0.4)', 15, 28);
+            }, 300);
+        }
+
+        function createParticle(char, color, minSize, maxSize) {
+            const container = document.getElementById('particles-background');
+            if (!container) return;
+
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.innerText = char;
+            
+            const size = Math.random() * (maxSize - minSize) + minSize;
+            const startX = Math.random() * window.innerWidth;
+            const duration = Math.random() * (10 - 5) + 5;
+
+            particle.style.fontSize = `${size}px`;
+            particle.style.color = color;
+            particle.style.left = `${startX}px`;
+            particle.style.top = `-50px`;
+            particle.style.animation = `fall ${duration}s linear forwards`;
+
+            container.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }
+
+        function triggerPetalBurst() {
+            for (let i = 0; i < 35; i++) {
+                setTimeout(() => {
+                    createParticle('🌸', 'rgba(255, 105, 180, 0.65)', 12, 22);
+                }, i * 60);
+            }
+            showToast("ဂုဏ်ပြုပန်းမိုးများ ရွာချလိုက်ပါပြီ");
+        }
+
+        function toggleGoldRain() {
+            const btn = document.getElementById('btn-gold-rain');
+            goldRainActive = !goldRainActive;
+            if (goldRainActive) {
+                btn.className = "px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded text-xs transition";
+                btn.innerText = "✨ ရွှေမိုး (ဖွင့်ထား)";
+            } else {
+                btn.className = "px-2.5 py-1 bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 rounded text-xs transition";
+                btn.innerText = "✨ ရွှေမိုး (ပိတ်ထား)";
+            }
+        }
+
+        function toggleChromaMode() {
+            chromaModeActive = !chromaModeActive;
+            const liveWindow = document.getElementById('live-overlay-container');
+            const btnChroma = document.getElementById('btn-chroma');
+
+            if (chromaModeActive) {
+                liveWindow.style.background = '#00FF00';
+                liveWindow.style.borderColor = '#00FF00';
+                btnChroma.innerHTML = '<i class="fa-solid fa-eye mr-1"></i> Control Panel ပြရန်';
+                btnChroma.className = "px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black rounded text-xs transition font-semibold";
+                showToast("OBS Chroma Overlay စတင်ပါပြီ (အစိမ်းရောင်ပြောင်းထားသည်)");
+            } else {
+                liveWindow.style.background = '';
+                liveWindow.style.borderColor = '';
+                btnChroma.innerHTML = '<i class="fa-solid fa-eye-slash mr-1"></i> OBS Overlay';
+                btnChroma.className = "px-2.5 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition font-semibold";
+                showToast("ပုံမှန် စင်မြင့်မြင်ကွင်းသို့ ပြောင်းလဲပြီးပါပြီ");
+            }
+        }
+
+        function submitManualWish() {
+            const nameInput = document.getElementById('manual-name');
+            const name = nameInput.value.trim();
+            if (!name) {
+                showToast("ပရိသတ်အမည် ဖြည့်စွက်ပေးပါ");
+                return;
+            }
+
+            handleIncomingWish(name, 'royal');
+            nameInput.value = '';
+        }
+
+        function playChime() {
+            try {
+                const sound = document.getElementById('bell-chime');
+                sound.currentTime = 0;
+                sound.play();
+            } catch (error) {
+                console.log("Audio play blocked by browser autoplay policies.");
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            toast.className = "fixed bottom-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 bg-amber-500 text-black px-4 py-2 rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 pointer-events-auto";
+            
+            setTimeout(() => {
+                toast.className = "fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 transition-all duration-300 bg-amber-500 text-black px-4 py-2 rounded-lg shadow-xl font-bold text-xs flex items-center gap-2 pointer-events-none";
+            }, 3000);
+        }
+
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            showToast("Gemini API Key သိမ်းဆည်းပြီးပါပြီ");
+            toggleSettings();
+        }
+
+        function clearQueue() {
+            wishesQueue = [];
+            updateQueueUI();
+            showToast("စောင့်ဆိုင်းစာရင်းအားလုံးကို ဖျက်လိုက်ပါပြီ");
+        }
+
+        function copyShareLink() {
+            const shareInput = document.getElementById('share-link-input');
+            shareInput.select();
+            document.execCommand('copy');
+            showToast("ပရိသတ်ပေးပို့ရန် Link ကို Copy ကူးပြီးပါပြီ");
         }
     </script>
 </body>

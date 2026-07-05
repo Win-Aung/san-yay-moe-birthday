@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         body { font-family: 'Pyidaungsu', sans-serif; background: #090610; color: #fce8cc; overflow-x: hidden; }
         .royal-gold-gradient { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -20,7 +19,6 @@
     </style>
 </head>
 <body class="min-h-screen">
-
     <div id="particles-background" class="fixed inset-0 pointer-events-none z-0"></div>
 
     <div class="container mx-auto px-4 py-6 relative z-10">
@@ -30,7 +28,6 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left: Live Screen -->
             <div class="lg:col-span-8 flex flex-col gap-4">
                 <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/30 flex flex-col items-center justify-center p-8">
                     <div id="wish-display-area" class="text-center w-full max-w-lg">
@@ -45,64 +42,53 @@
                 </div>
             </div>
 
-            <!-- Right: Admin Panel -->
             <div class="lg:col-span-4 flex flex-col gap-4">
                 <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
-                    <h2 class="text-lg font-bold text-amber-300 mb-3">ပရိသတ်ဆုတောင်းများ (Queue)</h2>
-                    <div id="wishes-queue" class="max-h-[300px] overflow-y-auto space-y-2 mb-3 text-sm">
-                        <!-- Wishes appear here -->
-                    </div>
-                    <button onclick="clearQueue()" class="text-xs text-rose-400 underline">အားလုံးဖျက်မည်</button>
+                    <h2 class="text-lg font-bold text-amber-300 mb-3">ဆုတောင်းစာ ပို့ရန်</h2>
+                    <input id="v-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2">
+                    <textarea id="v-wish" placeholder="မွေးနေ့ဆုတောင်း..." class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2 h-20"></textarea>
+                    <button onclick="submitWish()" class="w-full py-2 royal-gold-button rounded-lg">ပေးပို့မည်</button>
                 </div>
 
                 <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
-                    <h2 class="text-lg font-bold text-amber-300 mb-3">QR Code (Viewer ပို့ရန်)</h2>
-                    <div class="flex justify-center bg-white p-2 rounded inline-block w-full">
-                        <img id="qr-image" src="" alt="QR" class="w-32 h-32">
-                    </div>
-                    <p class="text-[10px] text-amber-400/50 mt-2 text-center">ဖုန်းဖြင့် Scan ဖတ်ပြီး ဆုတောင်းစာ ပို့ပေးပါ</p>
+                    <h2 class="text-lg font-bold text-amber-300 mb-3">Queue</h2>
+                    <div id="wishes-queue" class="max-h-[200px] overflow-y-auto space-y-2 mb-3 text-sm"></div>
+                    <button onclick="clearQueue()" class="text-xs text-rose-400 underline">အားလုံးဖျက်မည်</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Viewer Submission Modal -->
-    <div id="viewer-modal" class="fixed inset-0 z-50 bg-[#090610] hidden flex flex-col items-center justify-center p-6 text-center">
-        <h2 class="text-2xl font-bold royal-gold-gradient mb-6">ဆုတောင်းစာ ပို့ရန်</h2>
-        <input id="v-name" type="text" placeholder="သင်၏အမည်" class="w-full max-w-xs bg-black/40 border border-amber-500/30 rounded-lg p-3 text-amber-100 mb-4">
-        <textarea id="v-wish" placeholder="မွေးနေ့ဆုတောင်း..." class="w-full max-w-xs bg-black/40 border border-amber-500/30 rounded-lg p-3 text-amber-100 mb-4 h-24"></textarea>
-        <button onclick="submitWish()" class="w-full max-w-xs py-3 royal-gold-button rounded-lg">ပေးပို့မည်</button>
-    </div>
-
     <script>
-        // Initialize
-        window.onload = () => {
-            generateQR();
-            if(window.location.search.includes('view=true')) {
-                document.getElementById('viewer-modal').classList.remove('hidden');
-            }
-        };
-
-        function generateQR() {
-            const url = window.location.href.split('?')[0] + "?view=true";
-            document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+        // အရေးကြီး: ပို့လိုက်တာနဲ့ ချက်ချင်းပြဖို့အတွက် Function အသစ်ရေးထားပါတယ်
+        function updateScreen(data) {
+            document.getElementById('main-title').innerText = data.name + " ၏ ဆုတောင်း";
+            document.getElementById('main-content').innerText = data.wish;
         }
 
-        // Logic for Submitting Wishes
         function submitWish() {
             const name = document.getElementById('v-name').value;
             const wish = document.getElementById('v-wish').value;
             if(!name || !wish) return alert("အချက်အလက် ပြည့်စုံအောင် ဖြည့်ပါ။");
             
             const wishData = { name, wish, time: Date.now() };
+            
+            // 1. LocalStorage ထဲသိမ်းမယ်
             localStorage.setItem('lastWish', JSON.stringify(wishData));
+            
+            // 2. ကိုယ့်မျက်နှာပြင်မှာ ချက်ချင်းပြမယ် (ဒီအချက်က အရေးကြီးတယ်)
+            updateScreen(wishData);
+            
+            // 3. Queue ထဲထည့်မယ်
+            addWishToQueue(wishData);
+            
             alert("ပို့ပြီးပါပြီ!");
         }
 
-        // Listen for new wishes in Admin mode
         window.addEventListener('storage', (e) => {
             if(e.key === 'lastWish') {
                 const data = JSON.parse(e.newValue);
+                updateScreen(data);
                 addWishToQueue(data);
             }
         });
@@ -112,18 +98,12 @@
             const div = document.createElement('div');
             div.className = "bg-amber-950/30 p-2 rounded cursor-pointer border border-amber-500/20";
             div.innerHTML = `<p class="font-bold text-amber-300 text-xs">${data.name}</p><p class="text-white text-xs truncate">${data.wish}</p>`;
-            div.onclick = () => showOnScreen(data);
+            div.onclick = () => updateScreen(data);
             queue.prepend(div);
-        }
-
-        function showOnScreen(data) {
-            document.getElementById('main-title').innerText = data.name + " ၏ ဆုတောင်း";
-            document.getElementById('main-content').innerText = data.wish;
         }
 
         function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; }
 
-        // Effects
         function toggleChroma() {
             document.getElementById('live-overlay-container').classList.toggle('green-screen');
         }

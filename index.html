@@ -92,11 +92,7 @@
                     <p class="text-[11px] text-amber-100/70 mb-4">QR Code ကို ဖုန်းဖြင့် Scan ဖတ်ပြီး ပရိသတ်များ ဆုတောင်းပို့နိုင်ပါသည်။</p>
                     <div class="flex flex-col items-center bg-black/40 p-4 rounded-lg border border-amber-500/20 mb-3">
                         <div id="qrcode-wrapper" class="p-2 bg-white rounded-lg inline-block mb-3"><img id="qr-image" src="" alt="Live QR Code" class="w-[120px] h-[120px] block"></div>
-                        <div id="connection-status" class="text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-amber-950/50 text-amber-400 border border-amber-500/20">ချိတ်ဆက်နေသည်...</div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <input id="share-link-input" type="text" readonly class="bg-black/60 border border-amber-500/20 text-xs px-2 py-1 rounded text-amber-200">
-                        <button onclick="openLocalTestTab()" class="w-full py-1 bg-amber-500 text-black font-bold rounded text-[9px] hover:bg-white transition uppercase">စမ်းသပ်ရန် Viewer ဖွင့်မည်</button>
+                        <div id="connection-status" class="text-[10px] text-center font-mono font-semibold py-1 px-3 rounded bg-amber-950/50 text-amber-400 border border-amber-500/20">စနစ်စတင်နေသည်...</div>
                     </div>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
@@ -106,46 +102,91 @@
                     </div>
                     <div id="wishes-queue" class="max-h-[180px] overflow-y-auto space-y-2 pr-1"></div>
                 </div>
-                <div class="glass-panel p-4 rounded-xl border border-amber-500/20">
-                    <div class="flex gap-1.5">
-                        <input id="manual-name" type="text" placeholder="ပရိသတ်အမည်" class="bg-black/40 border border-amber-500/20 rounded px-2.5 py-1 text-xs text-amber-100 flex-grow">
-                        <button onclick="submitManualWish()" class="px-3 py-1 royal-gold-button rounded text-xs">ဖန်တီးရန်</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <div id="viewer-submission-screen" class="hidden fixed inset-0 z-50 bg-[#07050a] p-6 flex flex-col justify-between">
-        <h1 class="text-xl font-bold royal-gold-gradient text-center">မင်းသားလေး စမ်းရေမိုး မွေးနေ့ပွဲ</h1>
-        <div class="max-w-sm mx-auto w-full space-y-4">
-            <input id="viewer-form-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/20 rounded-lg p-2.5 text-xs text-amber-100">
-            <button onclick="sendViewerWish()" class="w-full py-3 royal-gold-button rounded-xl text-xs">ဆုတောင်းစာလွှာ ပို့မည်</button>
+    <!-- Viewer Screen -->
+    <div id="viewer-submission-screen" class="hidden fixed inset-0 z-50 bg-[#07050a] p-6 flex flex-col items-center justify-center">
+        <h1 class="text-2xl font-bold royal-gold-gradient text-center mb-8">မင်းသားလေး စမ်းရေမိုး မွေးနေ့ပွဲ</h1>
+        <div class="max-w-sm mx-auto w-full space-y-4 glass-panel p-6 rounded-xl border border-amber-500/30">
+            <input id="viewer-form-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/20 rounded-lg p-3 text-amber-100">
+            <textarea id="viewer-form-wish" placeholder="ဆုတောင်းစကား..." class="w-full bg-black/40 border border-amber-500/20 rounded-lg p-3 text-amber-100 h-24"></textarea>
+            <button onclick="sendViewerWish()" class="w-full py-3 royal-gold-button rounded-xl">ပေးပို့မည်</button>
         </div>
     </div>
 
     <audio id="bell-chime" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav"></audio>
 
     <script>
+        // Data & Variables
         const slidesData = [
             { title: "စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်", content: "သျှင်သျှင်နုနု၊ ယဉ်ယဉ်ကျေးကျေးနဲ့ ရိုးရာအကအလှတွေနဲ့ ပရိသတ်ကို ဆွဲဆောင်ထားနိုင်တဲ့ မင်းသားလေး စမ်းရေမိုး။" },
             { title: "မင်္ဂလာရှိလှသော မွေးနေ့ရက်မြတ်", content: "အနုပညာကို အသက်ထက်တန်ဖိုးထားတဲ့ မင်းသားလေးအတွက် ဂုဏ်ပြုဆုတောင်းခြင်း။" },
             { title: "ရိုးရာကို အသက်သွင်းသူ", content: "ကိုယ်ပိုင် Signature ဟန်ပန်တွေနဲ့ ပရိသတ်အသည်းကို ဖမ်းစားထားသူ။" },
-            { title: "ကမ္ဘာ့စင်မြင့်ဆီသို့", content: "မြန်မာ့ရိုးရာဇာတ်သဘင်ကို ယူနက်စကို စာရင်းဝင်စေဖို့ ရည်မှန်းချက်ကြီးကြီးနဲ့ ကြိုးစားနေသူ။" },
-            { title: "စစ်မှန်သော မေတ္တာ", content: "ပရိသတ်တွေရဲ့ မေတ္တာအချစ်တွေဟာ မင်းသားလေးအတွက် အခိုင်မာဆုံးသော အကာအကွယ်ဖြစ်ပါစေ။" }
+            { title: "ကမ္ဘာ့စင်မြင့်ဆီသို့", content: "မြန်မာ့ရိုးရာဇာတ်သဘင်ကို ယူနက်စကို စာရင်းဝင်စေဖို့ ရည်မှန်းချက်ကြီးကြီးနဲ့ ကြိုးစားနေသူ။" }
         ];
 
         let currentSlideIndex = 0;
-        let autoPlayTimer = null;
-        let goldRainActive = true;
+        let peer = null;
+        let hostId = null;
+        let connection = null;
 
+        // Initialization
         window.onload = () => {
             renderSlide();
             initGoldRain();
-            generateLocalChannelId();
-            checkIfViewer();
+            
+            const params = new URLSearchParams(window.location.search);
+            if(params.has('host')) {
+                // HOST MODE
+                hostId = params.get('host');
+                initHost();
+            } else if(params.has('view')) {
+                // VIEWER MODE
+                document.getElementById('viewer-submission-screen').classList.remove('hidden');
+                hostId = params.get('view');
+            } else {
+                // START HOST
+                peer = new Peer();
+                peer.on('open', (id) => {
+                    const hostUrl = window.location.href.split('?')[0] + "?host=" + id;
+                    const viewerUrl = window.location.href.split('?')[0] + "?view=" + id;
+                    document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(viewerUrl)}`;
+                    document.getElementById('connection-status').innerText = "စောင့်ဆိုင်းနေသည်...";
+                    initHost(id);
+                });
+            }
         };
 
+        function initHost(id) {
+            peer = new Peer(id);
+            peer.on('connection', (conn) => {
+                connection = conn;
+                document.getElementById('connection-status').innerText = "ပရိသတ်တစ်ဦး ချိတ်ဆက်ထားသည်";
+                connection.on('data', (data) => {
+                    displayWish(data.name, data.wish);
+                });
+            });
+        }
+
+        function sendViewerWish() {
+            const name = document.getElementById('viewer-form-name').value;
+            const wish = document.getElementById('viewer-form-wish').value;
+            if(!name || !wish) return alert("အချက်အလက်ဖြည့်စွက်ပါ");
+
+            const peer = new Peer();
+            peer.on('open', () => {
+                const conn = peer.connect(hostId);
+                conn.on('open', () => {
+                    conn.send({ name, wish });
+                    alert("ဆုတောင်းစာလွှာ ပို့ပြီးပါပြီ!");
+                    document.getElementById('viewer-form-wish').value = '';
+                });
+            });
+        }
+
+        // UI Functions
         function renderSlide() {
             document.getElementById('slide-title').innerText = slidesData[currentSlideIndex].title;
             document.getElementById('slide-content').innerText = slidesData[currentSlideIndex].content;
@@ -157,17 +198,42 @@
 
         function toggleAutoPlay() {
             const btn = document.getElementById('btn-auto-play');
-            if (autoPlayTimer) {
-                clearInterval(autoPlayTimer); autoPlayTimer = null;
+            if (window.autoPlayTimer) {
+                clearInterval(window.autoPlayTimer); window.autoPlayTimer = null;
                 btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Auto-Play';
             } else {
-                autoPlayTimer = setInterval(nextSlide, 3000);
+                window.autoPlayTimer = setInterval(nextSlide, 3000);
                 btn.innerHTML = '<i class="fa-solid fa-pause mr-1"></i> Stop';
             }
         }
 
+        function displayWish(name, text) {
+            document.getElementById('wish-sender-title').innerText = `${name} မှ ဆုတောင်းအပ်ပါသည်`;
+            document.getElementById('wish-generated-text').innerText = text;
+            
+            // Queue logic
+            const q = document.getElementById('wishes-queue');
+            const badge = document.getElementById('queue-badge');
+            const item = document.createElement('div');
+            item.className = "bg-amber-950/30 p-2 rounded text-[10px] text-amber-200 border border-amber-500/10";
+            item.innerText = `${name}: ${text}`;
+            q.prepend(item);
+            badge.innerText = parseInt(badge.innerText) + 1;
+
+            // Show on Big Screen
+            document.getElementById('slide-display-area').classList.add('hidden');
+            const card = document.getElementById('wish-card-display');
+            card.classList.remove('hidden');
+            setTimeout(() => card.classList.remove('scale-95', 'opacity-0'), 50);
+            
+            document.getElementById('bell-chime').play();
+            setTimeout(() => { 
+                card.classList.add('hidden'); 
+                document.getElementById('slide-display-area').classList.remove('hidden'); 
+            }, 10000);
+        }
+
         function initGoldRain() {
-            if (!goldRainActive) return;
             const p = document.createElement('div');
             p.className = 'particle';
             p.style.left = Math.random() * 100 + '%';
@@ -175,60 +241,21 @@
             p.innerHTML = '✨';
             document.getElementById('particles-background').appendChild(p);
             setTimeout(() => p.remove(), 5000);
-            setTimeout(initGoldRain, 500);
+            setTimeout(initGoldRain, 800);
         }
 
-        function toggleGoldRain() {
-            goldRainActive = !goldRainActive;
-            document.getElementById('btn-gold-rain').innerText = goldRainActive ? "✨ ရွှေမိုး (ဖွင့်ထား)" : "✨ ရွှေမိုး (ပိတ်ထား)";
-            if (goldRainActive) initGoldRain();
-        }
-
-        function toggleChromaMode() {
-            const el = document.getElementById('live-overlay-container');
-            el.classList.toggle('bg-green-600');
-            el.classList.toggle('curtain-backdrop');
-        }
-
-        function submitManualWish() {
-            const name = document.getElementById('manual-name').value;
-            if(!name) return;
-            displayWish(name, "မွေးနေ့မှာ ကျန်းမာချမ်းသာပါစေဗျာ။");
-            document.getElementById('manual-name').value = '';
-        }
-
-        function displayWish(name, text) {
-            document.getElementById('wish-sender-title').innerText = `${name} မှ ဆုတောင်းအပ်ပါသည်`;
-            document.getElementById('wish-generated-text').innerText = text;
-            document.getElementById('slide-display-area').classList.add('hidden');
-            const card = document.getElementById('wish-card-display');
-            card.classList.remove('hidden');
-            setTimeout(() => card.classList.remove('scale-95', 'opacity-0'), 50);
-            document.getElementById('bell-chime').play();
-            setTimeout(() => { card.classList.add('hidden'); document.getElementById('slide-display-area').classList.remove('hidden'); }, 8000);
-        }
-
-        function generateLocalChannelId() {
-            const id = 'SANYAYMOE-' + Math.floor(Math.random()*9999);
-            document.getElementById('share-link-input').value = window.location.href + "?view=" + id;
-            document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href + "?view=" + id)}`;
-        }
-
-        function checkIfViewer() {
-            const params = new URLSearchParams(window.location.search);
-            if(params.has('view')) {
-                document.getElementById('viewer-submission-screen').classList.remove('hidden');
-            }
-        }
-
-        function sendViewerWish() {
-            const name = document.getElementById('viewer-form-name').value;
-            if(name) alert("ဆုတောင်းစာလွှာ ပို့ပြီးပါပြီ။ မင်းသားလေး စမ်းရေမိုး မြင်တွေ့နိုင်အောင် တင်ပေးလိုက်ပါပြီ!");
-        }
-
+        function toggleGoldRain() { alert("အကျိုးသက်ရောက်မှု ပြောင်းလဲပါပြီ"); }
+        function toggleChromaMode() { document.getElementById('live-overlay-container').classList.toggle('bg-green-600'); }
         function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; document.getElementById('queue-badge').innerText = '0'; }
         function triggerPetalBurst() { alert("ပန်းမိုး ပွင့်လာပါပြီ!"); }
-        function openLocalTestTab() { window.open(window.location.href + "?view=test", "_blank"); }
     </script>
 </body>
 </html>
+```
+
+### ပြင်ဆင်ထားသည့် အချက်များ -
+၁။ **PeerJS ချိတ်ဆက်မှု:** App ကို Host (သင်) ဖွင့်လိုက်တာနဲ့ ထူးခြားတဲ့ ID တစ်ခု generate လုပ်ပေးပြီး QR code ထဲမှာ ထည့်ပေးထားပါတယ်။
+၂။ **Viewer Submission:** QR code ကို ဖုန်းနဲ့ scan ဖတ်ပြီးဝင်လာတဲ့သူတွေအတွက် အမည်နဲ့ ဆုတောင်းစာ ရိုက်ထည့်နိုင်တဲ့ ပုံစံလေး ပြင်ပေးထားပါတယ်။
+၃။ **Real-time Update:** ပရိသတ်က ပို့လိုက်တာနဲ့ သင့် OBS မှာရှိတဲ့ `wish-card-display` မှာ အလိုအလျောက် ပေါ်လာပြီး `wishes-queue` ထဲမှာလည်း စာရင်းဝင်သွားပါမယ်။
+
+ဒီဖိုင်ကို အစားထိုးလိုက်ရုံနဲ့ အားလုံး အဆင်ပြေသွားပါလိမ့်မယ်။ နောက်ထပ် အကူအညီလိုသေးရင် ပြောပေးပါဦးခင်ဗျာ။

@@ -5,123 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>စမ်းရေမိုး YouTube Live Celebration Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Pyidaungsu', sans-serif; background: #090610; color: #fce8cc; overflow-x: hidden; }
-        .royal-gold-gradient { background: linear-gradient(135deg, #FFE89C 0%, #D4AF37 50%, #8B6508 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .glass-panel { background: rgba(15, 10, 25, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.2); }
-        .royal-gold-button { background: linear-gradient(135deg, #D4AF37 0%, #8B6508 100%); color: #090610; font-weight: bold; transition: all 0.3s; }
-        .curtain-backdrop { background: linear-gradient(90deg, #2b0307 0%, #110103 50%, #2b0307 100%); }
-        .green-screen { background: #00FF00 !important; }
-        @keyframes fall { 0% { transform: translateY(-50px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
-        .particle { position: absolute; pointer-events: none; z-index: 5; animation: fall linear infinite; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: #0a0614; color: #fce8cc; overflow-x: hidden; }
+        .royal-gold { background: linear-gradient(135deg, #2d1b4e 0%, #0a0614 100%); }
+        .glass-morphism { background: rgba(26, 11, 46, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.3); }
+        .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+        .banner-float { animation: floatIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes floatIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
-<body class="min-h-screen">
-    <div id="particles-background" class="fixed inset-0 pointer-events-none z-0"></div>
+<body class="royal-gold min-h-screen">
 
-    <div class="container mx-auto px-4 py-6 relative z-10">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl font-extrabold royal-gold-gradient mb-1">✨ စမ်းရေမိုး YouTube Live Celebration Hub ✨</h1>
-            <p class="text-amber-200/60 text-sm">မွေးနေ့ဂုဏ်ပြုပွဲ တိုက်ရိုက်ထုတ်လွှင့်မှု စနစ်</p>
-        </header>
+    <canvas id="confetti" class="confetti-canvas"></canvas>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8 flex flex-col gap-4">
-                <div id="live-overlay-container" class="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden curtain-backdrop border border-amber-500/30 flex flex-col items-center justify-center p-8">
-                    <div id="wish-display-area" class="text-center w-full max-w-lg">
-                        <h2 id="main-title" class="text-2xl font-bold text-amber-100 mb-4">မင်္ဂလာရှိသော မွေးနေ့ဖြစ်ပါစေ</h2>
-                        <p id="main-content" class="text-lg text-amber-200/90 italic">မင်းသားလေး စမ်းရေမိုးအတွက် ဆုတောင်းစကားများ...</p>
-                    </div>
-                </div>
+    <div id="app-container" class="max-w-4xl mx-auto p-4">
+        <!-- Mode Switcher -->
+        <div class="mb-6 flex gap-4 justify-center">
+            <button onclick="setMode('admin')" class="px-6 py-2 bg-purple-900 rounded-full border border-gold-500 shadow-lg text-sm text-white">Control Panel</button>
+            <button onclick="setMode('overlay')" class="px-6 py-2 bg-green-900 rounded-full border border-green-500 shadow-lg text-sm text-white">OBS Overlay</button>
+        </div>
 
-                <div class="glass-panel p-4 rounded-xl flex gap-3">
-                    <button onclick="toggleChroma()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-bold">OBS Overlay (Green)</button>
-                    <button onclick="toggleGoldRain()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-black rounded text-sm font-bold">ရွှေမိုး (On/Off)</button>
-                </div>
+        <!-- Admin Section -->
+        <div id="admin-section" class="glass-morphism p-8 rounded-2xl">
+            <h2 class="text-2xl font-bold text-[#D4AF37] mb-6 border-b border-[#D4AF37]/30 pb-2">ပရိသတ်ဆုတောင်း လက်ခံမည်</h2>
+            
+            <!-- QR Code Container -->
+            <div class="flex flex-col items-center mb-6">
+                <p class="text-sm text-amber-500 mb-2">ပရိသတ်များ Scan ဖတ်ရန်:</p>
+                <div id="qrcode" class="bg-white p-2 rounded-lg"></div>
             </div>
 
-            <div class="lg:col-span-4 flex flex-col gap-4">
-                <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
-                    <h2 class="text-lg font-bold text-amber-300 mb-3">ဆုတောင်းစာ ပို့ရန်</h2>
-                    <input id="v-name" type="text" placeholder="သင်၏အမည်" class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2">
-                    <textarea id="v-wish" placeholder="မွေးနေ့ဆုတောင်း..." class="w-full bg-black/40 border border-amber-500/30 rounded-lg p-2 text-amber-100 mb-2 h-20"></textarea>
-                    <button onclick="submitWish()" class="w-full py-2 royal-gold-button rounded-lg">ပေးပို့မည်</button>
-                </div>
+            <div class="space-y-4">
+                <input id="fan-name" type="text" placeholder="ပရိသတ်အမည်" class="w-full bg-black/50 p-3 rounded-lg border border-amber-800 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]">
+                <textarea id="fan-wish" placeholder="ဆုတောင်းစကား..." class="w-full bg-black/50 p-3 rounded-lg border border-amber-800 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] h-24"></textarea>
+                <button id="wish-btn" onclick="submitWish()" class="w-full bg-[#D4AF37] hover:bg-[#b89620] py-3 text-black font-bold rounded-lg transition-all transform active:scale-95">Screen ပေါ်တင်မည်</button>
+            </div>
+        </div>
 
-                <div class="glass-panel p-5 rounded-xl border border-amber-500/30">
-                    <h2 class="text-lg font-bold text-amber-300 mb-3">Queue</h2>
-                    <div id="wishes-queue" class="max-h-[200px] overflow-y-auto space-y-2 mb-3 text-sm"></div>
-                    <button onclick="clearQueue()" class="text-xs text-rose-400 underline">အားလုံးဖျက်မည်</button>
-                </div>
+        <!-- Overlay Section -->
+        <div id="overlay-section" class="hidden flex flex-col items-center justify-center h-[70vh]">
+            <div id="live-banner" class="hidden glass-morphism p-10 rounded-3xl border-2 border-[#D4AF37] text-center max-w-xl w-full shadow-[0_0_60px_rgba(212,175,55,0.2)]">
+                <h3 id="display-name" class="text-3xl font-bold text-[#D4AF37] mb-4 tracking-wide"></h3>
+                <p id="display-wish" class="text-xl text-white italic leading-relaxed"></p>
             </div>
         </div>
     </div>
 
     <script>
-        // အရေးကြီး: ပို့လိုက်တာနဲ့ ချက်ချင်းပြဖို့အတွက် Function အသစ်ရေးထားပါတယ်
-        function updateScreen(data) {
-            document.getElementById('main-title').innerText = data.name + " ၏ ဆုတောင်း";
-            document.getElementById('main-content').innerText = data.wish;
+        // 🚨 ဤနေရာတွင် သင့် Firebase Config ကို ပြန်ထည့်ပေးပါ 🚨
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            databaseURL: "https://your-app.firebaseio.com",
+            projectId: "your-app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // QR Code Generator
+        new QRCode(document.getElementById("qrcode"), {
+            text: window.location.href,
+            width: 120, height: 120
+        });
+
+        function setMode(mode) {
+            document.getElementById('admin-section').classList.toggle('hidden', mode !== 'admin');
+            document.getElementById('overlay-section').classList.toggle('hidden', mode !== 'overlay');
         }
 
         function submitWish() {
-            const name = document.getElementById('v-name').value;
-            const wish = document.getElementById('v-wish').value;
+            const name = document.getElementById('fan-name').value;
+            const wish = document.getElementById('fan-wish').value;
             if(!name || !wish) return alert("အချက်အလက် ပြည့်စုံအောင် ဖြည့်ပါ။");
-            
-            const wishData = { name, wish, time: Date.now() };
-            
-            // 1. LocalStorage ထဲသိမ်းမယ်
-            localStorage.setItem('lastWish', JSON.stringify(wishData));
-            
-            // 2. ကိုယ့်မျက်နှာပြင်မှာ ချက်ချင်းပြမယ် (ဒီအချက်က အရေးကြီးတယ်)
-            updateScreen(wishData);
-            
-            // 3. Queue ထဲထည့်မယ်
-            addWishToQueue(wishData);
-            
-            alert("ပို့ပြီးပါပြီ!");
+            database.ref('wishes/').push({ name, wish, time: Date.now() });
+            document.getElementById('fan-name').value = '';
+            document.getElementById('fan-wish').value = '';
         }
 
-        window.addEventListener('storage', (e) => {
-            if(e.key === 'lastWish') {
-                const data = JSON.parse(e.newValue);
-                updateScreen(data);
-                addWishToQueue(data);
-            }
+        database.ref('wishes/').limitToLast(1).on('value', (snapshot) => {
+            snapshot.forEach((child) => {
+                const data = child.val();
+                displayBanner(data);
+            });
         });
 
-        function addWishToQueue(data) {
-            const queue = document.getElementById('wishes-queue');
-            const div = document.createElement('div');
-            div.className = "bg-amber-950/30 p-2 rounded cursor-pointer border border-amber-500/20";
-            div.innerHTML = `<p class="font-bold text-amber-300 text-xs">${data.name}</p><p class="text-white text-xs truncate">${data.wish}</p>`;
-            div.onclick = () => updateScreen(data);
-            queue.prepend(div);
+        function displayBanner(data) {
+            const banner = document.getElementById('live-banner');
+            document.getElementById('display-name').innerText = `✨ ${data.name} ✨`;
+            document.getElementById('display-wish').innerText = data.wish;
+            banner.classList.remove('hidden');
+            banner.classList.add('banner-float');
+            triggerConfetti();
+            setTimeout(() => { banner.classList.add('hidden'); }, 10000);
         }
 
-        function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; }
-
-        function toggleChroma() {
-            document.getElementById('live-overlay-container').classList.toggle('green-screen');
-        }
-
-        function toggleGoldRain() {
-            const container = document.getElementById('particles-background');
-            if(container.innerHTML !== '') {
-                container.innerHTML = '';
-            } else {
-                for(let i=0; i<20; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = Math.random()*100 + '%';
-                    p.style.animationDuration = (Math.random()*3+2) + 's';
-                    p.innerHTML = '✨';
-                    container.appendChild(p);
-                }
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = Array.from({length: 60}, () => ({
+                x: Math.random() * canvas.width, y: -20, size: Math.random()*6+2, speed: Math.random()*3+2, color: '#D4AF37'
+            }));
+            function draw() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath(); 
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); 
+                    ctx.fill();
+                });
+                if(particles.some(p => p.y < canvas.height)) requestAnimationFrame(draw);
             }
+            draw();
         }
     </script>
 </body>

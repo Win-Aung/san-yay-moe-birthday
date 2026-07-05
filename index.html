@@ -19,23 +19,37 @@
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
 
-    <div id="app" class="w-full max-w-7xl mx-auto px-6">
+    <div id="app" class="w-full max-w-4xl">
+        <!-- Control Toggles -->
+        <div class="flex justify-center gap-4 mb-10">
+            <button onclick="switchView('admin')" class="bg-amber-900 px-6 py-2 rounded-full border border-amber-600 hover:bg-amber-800 transition">Control Panel</button>
+            <button onclick="switchView('stage')" class="bg-red-900 px-6 py-2 rounded-full border border-red-600 hover:bg-red-800 transition">Stage View</button>
+        </div>
 
-<div id="stage-view"
-class="hidden stage-frame rounded-3xl p-20 min-h-[650px]
-flex flex-col items-center justify-center text-center">
+        <!-- Stage View -->
+        <div id="stage-view" class="hidden stage-frame rounded-3xl p-20 min-h-[400px] flex flex-col items-center justify-center text-center">
+            <h5 id="display-name" class="text-amber-500 text-6xl font-black mb-8 gold-glow">မွေးနေ့ဂုဏ်ပြုပွဲ</h5>
+            <p id="display-wish" class="text-3xl font-bold italic text-white leading-relaxed">"ပရိသတ်များ၏ ဆုတောင်းစာများ ရောက်ရှိလာပါမည်..."</p>
+			
+        </div>
 
-<h3 id="display-name"
-class="text-amber-500 text-8xl font-black mb-10 gold-glow">
-မွေးနေ့ဂုဏ်ပြုပွဲ
-</h3>
+        <!-- Admin View -->
+        <div id="admin-view" class="glass p-8 rounded-2xl border border-amber-900">
+            <h2 class="text-2xl font-bold text-amber-500 mb-6 text-center">Admin Control Panel</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <input id="in-name" placeholder="အမည်" class="w-full bg-stone-900 border border-amber-800 p-3 rounded-lg text-white mb-4">
+                    <textarea id="in-wish" placeholder="ဆုတောင်းစာ..." class="w-full bg-stone-900 border border-amber-800 p-3 rounded-lg text-white h-32 mb-4"></textarea>
+                    <button onclick="submitWish()" class="w-full bg-amber-600 hover:bg-amber-500 py-3 rounded-lg font-bold">ဂုဏ်ပြုပေးပို့မည်</button>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div id="qrcode" class="bg-white p-2 rounded-lg"></div>
+                    <p class="mt-2 text-xs text-amber-700">ပရိသတ်များအတွက် QR Code</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<p id="display-wish"
-class="text-5xl font-bold italic text-white leading-relaxed max-w-5xl">
-"ပရိသတ်များ၏ ဆုတောင်းစာများ ရောက်ရှိလာပါမည်..."
-</p>
-
-</div>
     <script>
         // 🛑 အရေးကြီး - Firebase Config 
         const firebaseConfig = {

@@ -124,6 +124,18 @@ const firebaseConfig = {
     messagingSenderId: "123456789012",
     appId: "1:123456789012:web:xxxxxx"
 };
+        function updateDisplay(data) {
+            document.getElementById('display-name').innerText = `မှ - ${data.name}`;
+            document.getElementById('display-wish').innerText = `"${data.wish}"`;
+        }
+
+        // ဒီ Function လေးကို ထည့်ပါ
+        function toggleOverlay() {
+            const content = document.getElementById('main-content');
+            // အပေါ်က Input Section ကို ဖျောက်ပြီး Presentation ကိုပဲ ချဲ့ပြပေးပါမယ်
+            content.classList.toggle('hidden');
+            // Overlay အတွက် Background တစ်ခု သီးခြား ဖန်တီးပေးပါ
+        }
     </script>
 </body>
 </html>

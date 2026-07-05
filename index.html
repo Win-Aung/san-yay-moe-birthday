@@ -119,180 +119,76 @@
     <audio id="bell-chime" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav"></audio>
 
     <script>
-        // Data & Variables
-        const slidesData = [
-            { title: "စင်မြင့်ထက်က အနုပညာကြယ်ပွင့်", content: "သျှင်သျှင်နုနု၊ ယဉ်ယဉ်ကျေးကျေးနဲ့ ရိုးရာအကအလှတွေနဲ့ ပရိသတ်ကို ဆွဲဆောင်ထားနိုင်တဲ့ မင်းသားလေး စမ်းရေမိုး။" },
-            { title: "မင်္ဂလာရှိလှသော မွေးနေ့ရက်မြတ်", content: "အနုပညာကို အသက်ထက်တန်ဖိုးထားတဲ့ မင်းသားလေးအတွက် ဂုဏ်ပြုဆုတောင်းခြင်း။" },
-            { title: "ရိုးရာကို အသက်သွင်းသူ", content: "ကိုယ်ပိုင် Signature ဟန်ပန်တွေနဲ့ ပရိသတ်အသည်းကို ဖမ်းစားထားသူ။" },
-            { title: "ကမ္ဘာ့စင်မြင့်ဆီသို့", content: "မြန်မာ့ရိုးရာဇာတ်သဘင်ကို ယူနက်စကို စာရင်းဝင်စေဖို့ ရည်မှန်းချက်ကြီးကြီးနဲ့ ကြိုးစားနေသူ။" }
-        ];
+        // အောက်ပါ Code ကို index.html ၏ script အပိုင်းတွင် အစားထိုးပါ
+let peer;
+let hostId;
 
-        let currentSlideIndex = 0;
-        let peer = null;
-        let hostId = null;
-        let connection = null;
-
-        // Initialization
-        window.onload = () => {
-            renderSlide();
-            initGoldRain();
-            
-            const params = new URLSearchParams(window.location.search);
-            if(params.has('host')) {
-                // HOST MODE
-                hostId = params.get('host');
-                initHost();
-            } else if(params.has('view')) {
-                // VIEWER MODE
-                document.getElementById('viewer-submission-screen').classList.remove('hidden');
-                hostId = params.get('view');
-            } else {
-                // START HOST
-                peer = new Peer();
-                peer.on('open', (id) => {
-                    const hostUrl = window.location.href.split('?')[0] + "?host=" + id;
-                    const viewerUrl = window.location.href.split('?')[0] + "?view=" + id;
-                    document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(viewerUrl)}`;
-                    document.getElementById('connection-status').innerText = "စောင့်ဆိုင်းနေသည်...";
-                    initHost(id);
-                });
-            }
-        };
-
-        function initHost(id) {
-            peer = new Peer(id);
-            peer.on('connection', (conn) => {
-                connection = conn;
-                document.getElementById('connection-status').innerText = "ပရိသတ်တစ်ဦး ချိတ်ဆက်ထားသည်";
-                connection.on('data', (data) => {
-                    displayWish(data.name, data.wish);
-                });
-            });
-        }
-
-        function sendViewerWish() {
-            const name = document.getElementById('viewer-form-name').value;
-            const wish = document.getElementById('viewer-form-wish').value;
-            if(!name || !wish) return alert("အချက်အလက်ဖြည့်စွက်ပါ");
-
-            const peer = new Peer();
-            peer.on('open', () => {
-                const conn = peer.connect(hostId);
-                conn.on('open', () => {
-                    conn.send({ name, wish });
-                    alert("ဆုတောင်းစာလွှာ ပို့ပြီးပါပြီ!");
-                    document.getElementById('viewer-form-wish').value = '';
-                });
-            });
-        }
-
-        // UI Functions
-        function renderSlide() {
-            document.getElementById('slide-title').innerText = slidesData[currentSlideIndex].title;
-            document.getElementById('slide-content').innerText = slidesData[currentSlideIndex].content;
-            document.getElementById('slide-index-indicator').innerText = `အပိုင်း - ${currentSlideIndex + 1} / ${slidesData.length}`;
-        }
-
-        function nextSlide() { currentSlideIndex = (currentSlideIndex + 1) % slidesData.length; renderSlide(); }
-        function prevSlide() { currentSlideIndex = (currentSlideIndex - 1 + slidesData.length) % slidesData.length; renderSlide(); }
-
-        function toggleAutoPlay() {
-            const btn = document.getElementById('btn-auto-play');
-            if (window.autoPlayTimer) {
-                clearInterval(window.autoPlayTimer); window.autoPlayTimer = null;
-                btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Auto-Play';
-            } else {
-                window.autoPlayTimer = setInterval(nextSlide, 3000);
-                btn.innerHTML = '<i class="fa-solid fa-pause mr-1"></i> Stop';
-            }
-        }
-
-        function displayWish(name, text) {
-            document.getElementById('wish-sender-title').innerText = `${name} မှ ဆုတောင်းအပ်ပါသည်`;
-            document.getElementById('wish-generated-text').innerText = text;
-            
-            // Queue logic
-            const q = document.getElementById('wishes-queue');
-            const badge = document.getElementById('queue-badge');
-            const item = document.createElement('div');
-            item.className = "bg-amber-950/30 p-2 rounded text-[10px] text-amber-200 border border-amber-500/10";
-            item.innerText = `${name}: ${text}`;
-            q.prepend(item);
-            badge.innerText = parseInt(badge.innerText) + 1;
-
-            // Show on Big Screen
-            document.getElementById('slide-display-area').classList.add('hidden');
-            const card = document.getElementById('wish-card-display');
-            card.classList.remove('hidden');
-            setTimeout(() => card.classList.remove('scale-95', 'opacity-0'), 50);
-            
-            document.getElementById('bell-chime').play();
-            setTimeout(() => { 
-                card.classList.add('hidden'); 
-                document.getElementById('slide-display-area').classList.remove('hidden'); 
-            }, 10000);
-        }
-
-        function initGoldRain() {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
-            p.innerHTML = '✨';
-            document.getElementById('particles-background').appendChild(p);
-            setTimeout(() => p.remove(), 5000);
-            setTimeout(initGoldRain, 800);
-        }
-
-        function toggleGoldRain() { alert("အကျိုးသက်ရောက်မှု ပြောင်းလဲပါပြီ"); }
-        function toggleChromaMode() { document.getElementById('live-overlay-container').classList.toggle('bg-green-600'); }
-        function clearQueue() { document.getElementById('wishes-queue').innerHTML = ''; document.getElementById('queue-badge').innerText = '0'; }
-        function triggerPetalBurst() { alert("ပန်းမိုး ပွင့်လာပါပြီ!"); }
-
-        function sendViewerWish() {
-    const name = document.getElementById('viewer-form-name').value;
-    const wish = document.getElementById('viewer-form-wish').value;
-    
-    if(!name || !wish) {
-        alert("အမည်နဲ့ ဆုတောင်းစကား ဖြည့်ပေးပါဦး");
-        return;
-    }
-
-    // URL ထဲက hostId (view parameter) ကို ပြန်ယူခြင်း
+window.onload = () => {
     const params = new URLSearchParams(window.location.search);
-    const targetHostId = params.get('view'); 
-
-    if(!targetHostId) {
-        alert("Error: Host ID မတွေ့ရှိပါ။ Link ကို ပြန်စစ်ပါ။");
-        return;
+    
+    // Viewer Mode
+    if(params.has('view')) {
+        document.getElementById('viewer-submission-screen').classList.remove('hidden');
+        hostId = params.get('view');
+    } 
+    // Host Mode
+    else {
+        startHost();
     }
+    renderSlide();
+    initGoldRain();
+};
 
-    console.log("Connecting to Host:", targetHostId);
+function startHost() {
+    const statusDiv = document.getElementById('connection-status');
+    statusDiv.innerText = "ချိတ်ဆက်နေသည်...";
     
-    // Viewer အတွက် သီးသန့် Peer instance တစ်ခု
-    const peer = new Peer();
-    
-    peer.on('open', () => {
-        const conn = peer.connect(targetHostId);
-        
-        conn.on('open', () => {
-            conn.send({ name, wish });
-            alert("ပို့ဆောင်ခြင်း အောင်မြင်ပါသည်။");
-            document.getElementById('viewer-form-wish').value = '';
-            document.getElementById('viewer-submission-screen').classList.add('hidden');
-        });
-        
-        conn.on('error', (err) => {
-            console.error("Connection Error:", err);
-            alert("Host နဲ့ ချိတ်ဆက်လို့မရပါ။ Host online ရှိမရှိ ပြန်စစ်ပေးပါ။");
+    // Peer instance အသစ်ဖန်တီးခြင်း
+    peer = new Peer(); 
+
+    peer.on('open', (id) => {
+        hostId = id;
+        statusDiv.innerText = "Host အဆင်သင့်ဖြစ်ပြီ (ID: " + id + ")";
+        const viewerUrl = window.location.href.split('?')[0] + "?view=" + id;
+        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(viewerUrl)}`;
+    });
+
+    peer.on('connection', (conn) => {
+        statusDiv.innerText = "ပရိသတ်တစ်ဦး ချိတ်ဆက်ထားသည်!";
+        conn.on('data', (data) => {
+            displayWish(data.name, data.wish);
         });
     });
 
     peer.on('error', (err) => {
-        console.error("Peer Error:", err);
-        alert("ချိတ်ဆက်မှု အမှားအယွင်းရှိသည် (" + err.type + ")");
+        statusDiv.innerText = "Error: " + err.type;
+        alert("PeerJS ချိတ်ဆက်မှု အမှားအယွင်း: " + err);
     });
 }
+
+function sendViewerWish() {
+    const name = document.getElementById('viewer-form-name').value;
+    const wish = document.getElementById('viewer-form-wish').value;
+    
+    if(!name || !wish) return alert("အချက်အလက်ဖြည့်ပါ");
+
+    // Viewer အတွက် သီးသန့် peer
+    const viewerPeer = new Peer();
+    
+    viewerPeer.on('open', () => {
+        const conn = viewerPeer.connect(hostId);
+        conn.on('open', () => {
+            conn.send({ name, wish });
+            alert("ဆုတောင်းစာ ပို့ပြီးပါပြီ!");
+        });
+        conn.on('error', (err) => {
+            alert("Host ကို ရှာမတွေ့ပါ။ Host လိုင်းကောင်းမကောင်း စစ်ပေးပါဦး။");
+        });
+    });
+}
+
+// ကျန်ရှိသော UI Functions များ...
+// (renderSlide, displayWish, initGoldRain, etc. ကို ဆက်ထားထားပါ)
     </script>
 </body>
 </html>
